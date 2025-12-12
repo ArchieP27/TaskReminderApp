@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task Reminder Application</title>
+</head>
+<body>
+<h1>Task Reminder Application</h1>
+<table border="1">
+    <tr>
+        <th>Task Id</th>
+        <th>Task Name</th>
+        <th>Task Description</th>
+        <th>Task Due Date</th>
+        <th>Task Status</th>
+        <th>Task Priority</th>
+        <th>Created At</th>
+    </tr>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}"></td>
+        <td th:text="${task.title}"></td>
+        <td th:text="${task.description}"></td>
+        <td th:text="${task.dueDate}"></td>
+        <td th:text="${task.status}"></td>
+        <td th:text="${task.priority}"></td>
+        <td th:text="${task.createdAt}"></td>
+    </tr>
+</table>
+<a href="tasks/add">Add New Task</a>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Tasks</title>
+</head>
+<body>
+    <h1>Add Tasks</h1>
+<form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
+    <label>Task Name</label>
+    <input type="text" th:field="*{title}" />
+    <label>Description</label>
+    <input type="text" th:field="*{description}" />
+    <label>Due Date</label>
+    <input type="date" th:field="*{dueDate}" />
+    <label>Priority</label>
+    <select th:field="*{priority}">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+    </select>
+    <label>Status</label>
+    <select th:field="*{status}">
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+    </select>
+    <input type="submit" value="Add Task">
+</form>
+</body>
