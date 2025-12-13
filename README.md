@@ -83,7 +83,7 @@ task-manager/
 │       └── edit-task.html
 │
 └── application.properties
-
+```
 ---
 
 ## How to run the Project
