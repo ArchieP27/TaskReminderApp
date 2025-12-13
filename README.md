@@ -1,7 +1,5 @@
 # 🗂️ Task Management Application
 
----
-
 ## 📌 Description
 
 A simple and user-friendly **Task Management Web Application** built using  
