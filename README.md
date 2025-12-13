@@ -1,18 +1,15 @@
 # 🗂️ Task Management Application
 
+
 ## 📌 Description
 
-A simple and user-friendly **Task Management Web Application** built using  
-**Spring Boot, Thymeleaf, and JavaScript**.
+A simple and user-friendly **Task Management Web Application** built using **Spring Boot, Thymeleaf, and JavaScript**.
 
-The application allows users to **add, edit, delete, and view tasks** using  
-multiple layouts including **Table View, Card View, and Calendar View**.
+The application allows users to **add, edit, delete, and view tasks** using multiple layouts including **Table View, Card View, and Calendar View**.
 
 ---
 
 ## 📸 Screenshot
-
-> Add one screenshot of the application UI here
 
 ![Task Manager Screenshot](screenshots/app.png)
 
