@@ -1,13 +1,18 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Tasks</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit Task</title>
     <link rel="stylesheet" href="/css/add.css">
 </head>
 <body>
+
 <header class="page-header">
     <div class="page-header-content">
-        <h1>Add New Task</h1>
+        <h1>Edit Task</h1>
         <a href="/api/tasks" class="back-link">Back to Task List</a>
     </div>
 </header>
@@ -17,9 +22,9 @@
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <form th:action="@{/api/tasks/add}" th:object="${task}" method="post">
+    <form th:action="@{|/api/tasks/update/${task.id}|}" th:object="${task}" method="post">
         <div>
-            <label>Task Name</label>
+            <label>Title</label>
             <input type="text" th:field="*{title}" required minlength="3" maxlength="50"/>
         </div>
 
@@ -30,8 +35,7 @@
 
         <div>
             <label>Due Date</label>
-            <input type="date" th:field="*{dueDate}" required
-                   th:min="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"/>
+            <input type="date" th:field="*{dueDate}" />
         </div>
 
         <div class="form-group-grid">
@@ -47,14 +51,18 @@
             <div>
                 <label>Status</label>
                 <select th:field="*{status}">
-                    <option value="">--Select--</option>
                     <option value="Pending">Pending</option>
                     <option value="Completed">Completed</option>
                 </select>
             </div>
         </div>
-        <input type="submit" value="Add Task">
+        <input type="submit" value="Update Task" class="update-btn"/>
     </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+        <a th:href="@{/api/tasks}" class="cancel-link">Cancel</a>
+    </p>
+
 </div>
 
 <footer>
@@ -63,4 +71,6 @@
     </div>
     <div>Task Reminder App &copy; 2025 - Created By Archie</div>
 </footer>
+
 </body>
+</html>

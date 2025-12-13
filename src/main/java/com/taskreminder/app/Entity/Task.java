@@ -1,27 +1,41 @@
 package com.taskreminder.app.Entity;
 
+import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name="task")
 public class Task {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Task_id")
     private Integer id;
+    @Column(name="Task_name")
     private String title;
     private String description;
-    private String dueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
     private String status;
     private String priority;
     private LocalDateTime createdAt;
 
     public Task(){}
 
-    public Task(Integer id, String title, String description, String dueDate, String status, String priority) {
-        this.id = id;
+    public Task(String title, String description, LocalDate dueDate, String status, String priority) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
         this.status = status;
         this.priority = priority;
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
     }
 
     public Integer getId() {
@@ -48,11 +62,11 @@ public class Task {
         this.description = description;
     }
 
-    public String getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
