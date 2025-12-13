@@ -98,18 +98,22 @@ task-manager/
 1. Clone the repository
 ```bash
 git clone https://github.com/your-username/task-manager.git
+```
 2. Open the project in an IDE.
 3. Configure database in application.properties.
 ```bash
 spring.datasource.url=jdbc:mysql://localhost:3306/taskdb
 spring.datasource.username=root
 spring.datasource.password=yourpassword
+```
 4. Run the application
 ```bash
 mvn spring-boot:run
+```
 5. Open in browser
 ```bash
 http://localhost:8080/api/tasks
+```
 
 ---
 
