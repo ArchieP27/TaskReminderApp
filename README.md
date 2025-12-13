@@ -1,4 +1,4 @@
-# 🗂️ Task Management Application
+# 🗂️ Task Reminder Application
 
 
 ## 📌 Description
