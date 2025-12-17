@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Edit Task</title>
-    <link rel="stylesheet" href="/css/add.css">
+    <link rel="stylesheet" href="/css/add.css" />
 </head>
 <body>
 
@@ -25,12 +25,12 @@
     <form th:action="@{|/api/tasks/update/${task.id}|}" th:object="${task}" method="post">
         <div>
             <label>Title</label>
-            <input type="text" th:field="*{title}" required minlength="3" maxlength="50"/>
+            <input type="text" th:field="*{title}" required minlength="3" maxlength="50" />
         </div>
 
         <div>
             <label>Description</label>
-            <input type="text" th:field="*{description}" required maxlength="500"/>
+            <input type="text" th:field="*{description}" required maxlength="500" />
         </div>
 
         <div>
@@ -42,21 +42,22 @@
             <div>
                 <label>Priority</label>
                 <select th:field="*{priority}">
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
+                    <option th:each="p : ${T(enums.TaskPriority).values()}"
+                            th:value="${p}" th:text="${p.label}">
+                    </option>
                 </select>
             </div>
 
             <div>
                 <label>Status</label>
                 <select th:field="*{status}">
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
+                    <option th:each="s : ${T(enums.TaskStatus).values()}"
+                            th:value="${s}" th:text="${s.label}">
+                    </option>
                 </select>
             </div>
         </div>
-        <input type="submit" value="Update Task" class="update-btn"/>
+        <input type="submit" value="Update Task" class="update-btn" />
     </form>
 
     <p style="text-align: center; margin-top: 20px;">
@@ -67,7 +68,7 @@
 
 <footer>
     <div class="clock-icon-container">
-        <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time">
+        <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time" />
     </div>
     <div>Task Reminder App &copy; 2025 - Created By Archie</div>
 </footer>

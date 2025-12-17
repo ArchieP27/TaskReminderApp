@@ -5,7 +5,7 @@
     <title>Task Reminder Application</title>
     <link rel="stylesheet" href="/css/style.css">
     <script th:inline="javascript">
-        const tasksData = [[${tasks}]];
+        const tasksData = [[${ tasks }]];
     </script>
     <script src="/js/app.js" defer></script>
     <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' />
@@ -13,250 +13,238 @@
 </head>
 
 <body>
-<div id="popup"
-     th:if="${errorMessage}"
-     class="popup-error">
-    <span th:text="${errorMessage}"></span>
-</div>
-<div class="container">
-    <div class="header-area">
-        <h1>Task Reminder Application</h1>
-        <a href="tasks/add" class="action-btn add-task-btn">
-            <img th:src="@{/images/plus.png}" class="icon" alt="Add">
-            Add New Task
-        </a>
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+        <span th:text="${errorMessage}"></span>
     </div>
-    <div th:if="${successMessage}"
-         class="alert alert-success"
-         style="margin-bottom: 15px;">
-        <span th:text="${successMessage}"></span>
-    </div>
-
-    <form action="/api/tasks" method="get">
-        <div>
-            <label>Search Title</label>
-            <input type="text" name="keyword" th:value="${param.keyword}" placeholder="Keyword"/>
+    <div class="container">
+        <div class="header-area">
+            <h1>Task Reminder Application</h1>
+            <a href="tasks/add" class="action-btn add-task-btn">
+                <img th:src="@{/images/plus.png}" class="icon" alt="Add">
+                Add New Task
+            </a>
         </div>
-        <div>
-            <label>Status</label>
-            <select name="status">
-                <option value="">All</option>
-                <option value="Pending" th:selected="${param.status=='Pending'}">Pending</option>
-                <option value="In Progress" th:selected="${param.status=='In Progress'}">In Progress</option>
-                <option value="Completed" th:selected="${param.status=='Completed'}">Completed</option>
-            </select>
+        <div th:if="${successMessage}" class="popup-success" style="margin-bottom: 15px;">
+            <span th:text="${successMessage}"></span>
         </div>
-        <div>
-            <label>Priority</label>
-            <select name="priority">
-                <option value="">All</option>
-                <option value="High" th:selected="${param.priority=='High'}">High</option>
-                <option value="Medium" th:selected="${param.priority=='Medium'}">Medium</option>
-                <option value="Low" th:selected="${param.priority=='Low'}">Low</option>
-            </select>
-        </div>
-        <div>
-            <label>Sort By</label>
-            <select name="sort">
-                <option value="">None</option>
-                <option value="dueDate" th:selected="${param.sort=='dueDate'}">Due Date</option>
-                <option value="priority" th:selected="${param.sort=='priority'}">Priority</option>
-                <option value="createdAt" th:selected="${param.sort=='createdAt'}">Created Date</option>
-            </select>
-        </div>
-        <a href="/api/tasks" class="clear-btn" title="Clear Filters">
-            <img th:src="@{/images/trash.png}" class="icon" alt="Clear">
-            Clear Filters
-        </a>
-        <input type="submit" value="Apply Filters">
-    </form>
 
-    <div class="view-toggle">
-        <button id="tableViewBtn" class="active">Table View</button>
-        <button id="cardViewBtn">Card View</button>
-        <button id="calendarViewBtn">Calendar View</button>
-    </div>
-
-    <table id="tableView" border="1">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Priority</th>
-            <th>Created At</th>
-            <th>Completed At</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="task : ${tasks}" th:class="|task-row priority-${task.priority}|">
-            <td th:text="${task.id}"></td>
-            <td th:text="${task.title}"></td>
-            <td th:text="${task.description}"></td>
-            <td th:text="${task.dueDate}"></td>
-            <td>
-                <span class="status-badge" th:classappend="|status-${task.status}|" th:text="${task.status}"></span>
-            </td>
-            <td>
-                <span class="priority-badge" th:classappend="|priority-${task.priority}|" th:text="${task.priority}"></span>
-            </td>
-
-            <td th:text="${task.createdAt}"></td>
-            <td th:text="${task.completedAt}"></td>
-
-            <td class="action-cell">
-
-    <!-- TOP ROW: View + Edit + Delete -->
-    <div class="action-group-top">
-
-        <a href="javascript:void(0)"
-           class="action-link action-view"
-           onclick="openTaskModal(this)"
-           th:data-id="${task.id}"
-           th:data-title="${task.title}"
-           th:data-desc="${task.description}"
-           th:data-duedate="${task.dueDate}"
-           th:data-status="${task.status}"
-           th:data-priority="${task.priority}"
-           th:data-created="${task.createdAt}"
-           th:data-completed="${task.completedAt}">
-            <img th:src="@{/images/view.png}" class="icon" alt="View">
-            View
-        </a>
-
-        <a th:href="@{|/api/tasks/update/${task.id}|}"
-           class="action-link action-edit">
-            <img th:src="@{/images/pencil.png}" class="icon" alt="Edit">
-            Edit
-        </a>
-
-        <a th:href="@{|/api/tasks/delete/${task.id}|}"
-           class="action-link action-delete"
-           onclick="return confirm('Are you sure you want to delete this task?');">
-            <img th:src="@{/images/trash-2.png}" class="icon" alt="Delete">
-            Delete
-        </a>
-
-    </div>
-
-    <a th:if="${task.status != 'Completed'}"
-       th:href="@{|/api/tasks/markAsDone/${task.id}|}"
-       class="action-link action-done">
-        <img th:src="@{/images/check-circle.png}" class="icon">
-        Mark as Done
-    </a>
-
-    <span th:if="${task.status == 'Completed'}"
-          class="action-link disabled">
-        ✔ Completed
-    </span>
-
-</td>
-
-
-        </tr>
-        </tbody>
-    </table>
-
-    <div id="cardView" class="card-view" style="display:none;">
-        <div th:each="task : ${tasks}"
-             th:class="|task-card priority-${task.priority}|">
-
-            <div class="card-title" th:text="${task.title}">Task Title</div>
-            <div class="card-description" th:text="${task.description}"></div>
-
-            <div class="card-detail">
-                Due Date: <span><strong th:text="${task.dueDate}"></strong></span>
+        <form action="/api/tasks" method="get">
+            <div>
+                <label>Search Title</label>
+                <input type="text" name="keyword" th:value="${param.keyword}" placeholder="Keyword" />
             </div>
-
-            <div class="card-detail">
-                Priority: <span><strong th:text="${task.priority}"></strong></span>
+            <div>
+                <label>Status</label>
+                <select name="status">
+                    <option value="">All</option>
+                    <option th:each="s : ${T(enums.TaskStatus).values()}" th:value="${s}"
+                        th:selected="${param.status == s.name()}" th:text="${s.label}">
+                    </option>
+                </select>
             </div>
+            <div>
+                <label>Priority</label>
+                <select name="priority">
+                    <option value="">All</option>
+                    <option th:each="p : ${T(enums.TaskPriority).values()}" th:value="${p}"
+                        th:selected="${param.priority == p.name()}" th:text="${p.label}">
+                    </option>
+                </select>
 
-            <div class="card-detail">
-                Status: <span class="status-badge" th:classappend="|status-${task.status}|" th:text="${task.status}"></span>
             </div>
+            <div>
+                <label>Sort By</label>
+                <select name="sort">
+                    <option value="">None</option>
+                    <option value="dueDate" th:selected="${param.sort=='dueDate'}">Due Date</option>
+                    <option value="priority" th:selected="${param.sort=='priority'}">Priority</option>
+                    <option value="createdAt" th:selected="${param.sort=='createdAt'}">Created Date</option>
+                    <option value="title" th:selected="${param.sort=='title'}">Title</option>
+                </select>
+            </div>
+            <a href="/api/tasks" class="clear-btn" title="Clear Filters">
+                <img th:src="@{/images/trash.png}" class="icon" alt="Clear">
+                Clear Filters
+            </a>
+            <input type="submit" value="Apply Filters">
+        </form>
 
-            
-            <div class="card-action-group-top">
+        <div class="view-toggle">
+            <button id="tableViewBtn" class="active">Table View</button>
+            <button id="cardViewBtn">Card View</button>
+            <button id="calendarViewBtn">Calendar View</button>
+        </div>
 
-    <a href="javascript:void(0)"
-       class="action-link action-view"
-       onclick="openTaskModal(this)"
-       th:data-id="${task.id}"
-       th:data-title="${task.title}"
-       th:data-desc="${task.description}"
-       th:data-duedate="${task.dueDate}"
-       th:data-status="${task.status}"
-       th:data-priority="${task.priority}"
-       th:data-created="${task.createdAt}"
-       th:data-completed="${task.completedAt}">
-        <img th:src="@{/images/view.png}" class="icon"> View
-    </a>
+        <table id="tableView">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Created At</th>
+                    <th>Completed At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="task : ${tasks}" th:class="|task-row priority-${task.priority.label}|">
+                    <td th:text="${task.id}"></td>
+                    <td th:text="${task.title}" class="camel-case"></td>
+                    <td th:text="${task.description}" class="camel-case"></td>
+                    <td th:text="${task.dueDate}"></td>
+                    <td>
+                        <span class="status-badge"
+                            th:classappend="|status-${#strings.toLowerCase(#strings.replace(task.status.label, ' ', '_'))}|"
+                            th:text="${task.status.label}">
+                        </span>
 
-    <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
-        <img th:src="@{/images/pencil.png}" class="icon"> Edit
-    </a>
+                        </span>
 
-    <a th:href="@{|/api/tasks/delete/${task.id}|}"
-       class="action-link action-delete"
-       onclick="return confirm('Are you sure you want to delete this task?');">
-        <img th:src="@{/images/trash-2.png}" class="icon"> Delete
-    </a>
+                    </td>
+                    <td>
+                        <span class="priority-badge" th:classappend="|priority-${task.priority.label}|"
+                            th:text="${task.priority.label}"></span>
+                    </td>
 
-</div>
+                    <td th:text="${task.createdAt}"></td>
+                    <td th:text="${task.completedAt}"></td>
 
-<div class="card-actions-bottom">
-    <a th:if="${task.status != 'Completed'}"
-       th:href="@{|/api/tasks/markAsDone/${task.id}|}"
-       class="action-link action-done">
-        <img th:src="@{/images/check-circle.png}" class="icon">
-        Mark as Done
-    </a>
+                    <td class="action-cell">
 
-    <span th:if="${task.status == 'Completed'}"
-          class="action-link disabled">
-        ✔ Completed
-    </span>
-</div>
+                        <div class="action-group-top">
+
+                            <a href="javascript:void(0)" class="action-link action-view" onclick="openTaskModal(this)"
+                                th:data-id="${task.id}" th:data-title="${task.title}" th:data-desc="${task.description}"
+                                th:data-duedate="${task.dueDate}" th:data-status="${task.status}"
+                                th:data-priority="${task.priority}" th:data-created="${task.createdAt}"
+                                th:data-completed="${task.completedAt}">
+                                <img th:src="@{/images/view.png}" class="icon" alt="View">
+                                View
+                            </a>
+
+                            <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
+                                <img th:src="@{/images/pencil.png}" class="icon" alt="Edit">
+                                Edit
+                            </a>
+
+                            <a th:href="@{|/api/tasks/delete/${task.id}|}" class="action-link action-delete"
+                                onclick="return confirm('Are you sure you want to delete this task?');">
+                                <img th:src="@{/images/trash-2.png}" class="icon" alt="Delete">
+                                Delete
+                            </a>
+
+                        </div>
+
+                        <a th:if="${task.status.label != 'Completed'}" th:href="@{|/api/tasks/markAsDone/${task.id}|}"
+                            class="action-link action-done">
+                            <img th:src="@{/images/check-circle.png}" class="icon">
+                            Mark as Done
+                        </a>
+
+                        <span th:if="${task.status.label == 'Completed'}" class="action-link disabled">
+                            ✔ Completed
+                        </span>
+
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="cardView" class="card-view" style="display:none;">
+            <div th:each="task : ${tasks}" th:class="|task-card priority-${task.priority.label}|">
+
+                <div class="card-title camel-case" th:text="${task.title}">Task Title</div>
+                <div class="card-description camel-case" th:text="${task.description}"></div>
+
+                <div class="card-detail">
+                    Due Date: <span><strong th:text="${task.dueDate}"></strong></span>
+                </div>
+
+                <div class="card-detail">
+                    Priority: <span><strong th:text="${task.priority}"></strong></span>
+                </div>
+
+                <div class="card-detail">
+                    Status: <span class="status-badge"
+                        th:classappend="|status-${#strings.toLowerCase(#strings.replace(task.status.label, ' ', '_'))}|"
+                        th:text="${task.status.label}">
+                    </span>
+
+                    </span>
+
+                </div>
 
 
+                <div class="card-action-group-top">
+
+                    <a href="javascript:void(0)" class="action-link action-view" onclick="openTaskModal(this)"
+                        th:data-id="${task.id}" th:data-title="${task.title}" th:data-desc="${task.description}"
+                        th:data-duedate="${task.dueDate}" th:data-status="${task.status.label}"
+                        th:data-priority="${task.priority.label}" th:data-created="${task.createdAt}"
+                        th:data-completed="${task.completedAt}">
+                        <img th:src="@{/images/view.png}" class="icon"> View
+                    </a>
+
+                    <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
+                        <img th:src="@{/images/pencil.png}" class="icon"> Edit
+                    </a>
+
+                    <a th:href="@{|/api/tasks/delete/${task.id}|}" class="action-link action-delete"
+                        onclick="return confirm('Are you sure you want to delete this task?');">
+                        <img th:src="@{/images/trash-2.png}" class="icon"> Delete
+                    </a>
+
+                </div>
+
+                <div class="card-actions-bottom">
+                    <a th:if="${task.status.label != 'Completed'}" th:href="@{|/api/tasks/markAsDone/${task.id}|}"
+                        class="action-link action-done">
+                        <img th:src="@{/images/check-circle.png}" class="icon">
+                        Mark as Done
+                    </a>
+
+                    <span th:if="${task.status.label == 'Completed'}" class="action-link disabled">
+                        ✔ Completed
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="calendarView" class="calendar-view" style="display:none;">
+            <div id='taskCalendar'></div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="clock-icon-container">
+            <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time">
+        </div>
+        <div>Task Reminder App &copy; 2025 - Created By Archie</div>
+    </footer>
+
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeTaskModal()">×</span>
+
+            <h2>Task Details</h2>
+
+            <div class="modal-row"><strong>ID:</strong> <span id="m-id"></span></div>
+            <div class="modal-row"><strong>Title:</strong> <span id="m-title" class="camel-case"></span></div>
+            <div class="modal-row"><strong>Description:</strong> <span id="m-desc" class="camel-case"></span></div>
+            <div class="modal-row"><strong>Due Date:</strong> <span id="m-due"></span></div>
+            <div class="modal-row"><strong>Status:</strong> <span id="m-status"></span></div>
+            <div class="modal-row"><strong>Priority:</strong> <span id="m-priority"></span></div>
+            <div class="modal-row"><strong>Created At:</strong> <span id="m-created"></span></div>
+            <div class="modal-row"><strong>Completed At:</strong> <span id="m-completed"></span></div>
         </div>
     </div>
-
-    <div id="calendarView" class="calendar-view" style="display:none;">
-        <div id='taskCalendar'></div>
-    </div>
-
-</div>
-
-<footer>
-    <div class="clock-icon-container">
-        <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time">
-    </div>
-    <div>Task Reminder App &copy; 2025 - Created By Archie</div>
-</footer>
-
-<div id="taskModal" class="modal-overlay">
-    <div class="modal-box">
-        <span class="modal-close" onclick="closeTaskModal()">×</span>
-
-        <h2>Task Details</h2>
-
-        <div class="modal-row"><strong>ID:</strong> <span id="m-id"></span></div>
-        <div class="modal-row"><strong>Title:</strong> <span id="m-title"></span></div>
-        <div class="modal-row"><strong>Description:</strong> <span id="m-desc"></span></div>
-        <div class="modal-row"><strong>Due Date:</strong> <span id="m-due"></span></div>
-        <div class="modal-row"><strong>Status:</strong> <span id="m-status"></span></div>
-        <div class="modal-row"><strong>Priority:</strong> <span id="m-priority"></span></div>
-        <div class="modal-row"><strong>Created At:</strong> <span id="m-created"></span></div>
-        <div class="modal-row"><strong>Completed At:</strong> <span id="m-completed"></span></div>
-    </div>
-</div>
-
 
 </body>
+
 </html>

@@ -2,6 +2,7 @@ package com.taskreminder.app.Controller;
 
 import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Service.TaskService;
+import enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,6 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-//    @GetMapping("/tasks")
     @GetMapping
     public String listTasks(
         @RequestParam(required = false) String status,
@@ -58,8 +58,6 @@ public class TaskController {
             model.addAttribute("task",task);
             return "add-task";
         }
-//        task.setId(TaskService.nextId());
-//        task.setCreatedAt(LocalDateTime.now());
         taskService.addTask(task);
         ra.addFlashAttribute("successMessage","Task added successfully!");
         return "redirect:/api/tasks";
@@ -71,7 +69,7 @@ public class TaskController {
         if (task == null) {
             return "redirect:/api/tasks";
         }
-        if ("Completed".equals(task.getStatus())) {
+        if (task.getStatus()== TaskStatus.COMPLETED) {
             ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
             return "redirect:/api/tasks";
         }

@@ -2,6 +2,7 @@ package com.taskreminder.app.Service;
 
 import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Repository.TaskRepository;
+import enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,11 +42,11 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        if ("Completed".equals(task.getStatus())) {
+        if (task.getStatus().equals(TaskStatus.COMPLETED)) {
             throw new IllegalStateException("Task is already completed and cannot be marked again.");
         }
 
-        task.setStatus("Completed");
+        task.setStatus(TaskStatus.COMPLETED);
         task.setCompletedAt(LocalDate.now());
         taskRepository.save(task);
     }
@@ -56,16 +57,14 @@ public class TaskService {
 
         if (status != null && !status.isEmpty()) {
             tasks = tasks.stream()
-                    .filter(t -> status.equalsIgnoreCase(t.getStatus()))
+                    .filter(t -> t.getStatus().name().equalsIgnoreCase(status))
                     .toList();
         }
-
         if (priority != null && !priority.isEmpty()) {
             tasks = tasks.stream()
-                    .filter(t -> priority.equalsIgnoreCase(t.getPriority()))
+                    .filter(t -> t.getPriority().name().equalsIgnoreCase(priority))
                     .toList();
         }
-
         if (keyword != null && !keyword.isEmpty()) {
             tasks = tasks.stream()
                     .filter(t -> t.getTitle().toLowerCase().contains(keyword.toLowerCase()))
@@ -82,6 +81,9 @@ public class TaskService {
                         .toList();
                 case "createdAt" -> tasks = tasks.stream()
                         .sorted(Comparator.comparing(Task::getCreatedAt))
+                        .toList();
+                case "title" -> tasks = tasks.stream()
+                        .sorted(Comparator.comparing(Task::getTitle))
                         .toList();
             }
         }
@@ -108,47 +110,4 @@ public class TaskService {
     public Page<Task> findAll(Pageable pageable) {
         return taskRepository.findAll(pageable);
     }
-
-//    private final List<Task> tasks = new ArrayList<>();
-//    private static int counter=100;
-//
-//    public TaskService(){
-//        tasks.add(new Task(1,"Lean Spring Boot","Basics of Project","2025-10-15","Pending","High"));
-//        tasks.add(new Task(2,"Practice Java","Collections & OOPS","2025-01-25","Pending","Medium"));
-//    }
-//
-//    public List<Task> getAllTasks(){
-//        return tasks;
-//    }
-//
-//    public static int nextId(){
-//        return counter++;
-//    }
-//
-//    public void addTask(Task task){
-//        tasks.add(task);
-//    }
-//
-//    public Optional<Task> findById(Integer id){
-//        return tasks.stream().filter(task -> task.getId().equals(id)).findFirst();
-//    }
-//
-//    public void updateTask(Task updated){
-//        for(int i=0;i<tasks.size();i++){
-//            if(tasks.get(i).getId().equals(updated.getId())){
-//                tasks.set(i,updated);
-//                return;
-//            }
-//        }
-//    }
-//
-//    public void deleteTask(Integer id){
-//        Iterator<Task> it = tasks.iterator();
-//        while(it.hasNext()){
-//            if(it.next().getId().equals(id)){
-//                it.remove();
-//                return;
-//            }
-//        }
-//    }
 }

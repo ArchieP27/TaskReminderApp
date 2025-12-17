@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getPriorityColor(priority) {
         switch (priority) {
-            case 'High': return '#E53935';
-            case 'Medium': return '#FF9800';
-            case 'Low': return '#4CAF50';
+            case 'HIGH': return '#E53935';
+            case 'MEDIUM': return '#FF9800';
+            case 'LOW': return '#4CAF50';
             default: return '#5A77F5';
         }
     }

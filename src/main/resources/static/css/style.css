@@ -21,6 +21,7 @@
 
     --status-completed: var(--color-success);
     --status-pending: var(--color-warning);
+    --status-inProgress: #1b4dcb;
 }
 
 @keyframes loading-pulse {
@@ -391,8 +392,9 @@ table th:nth-child(3), table td:nth-child(3) {
     transform: scale(1.05);
 }
 
-.status-Pending { background-color: #fff3c9; color: var(--status-pending); }
-.status-Completed { background-color: #d8f5e2; color: var(--status-completed); }
+.status-pending { background-color: #fff3c9; color: var(--status-pending); }
+.status-in_progress { background-color: #a1c8e7; color: var(--status-inProgress); }
+.status-completed { background-color: #d8f5e2; color: var(--status-completed); }
 
 .priority-badge.priority-High { background-color: var(--priority-high); color: white; }
 .priority-badge.priority-Medium { background-color: var(--priority-medium); color: white; }
@@ -428,9 +430,12 @@ table th:nth-child(3), table td:nth-child(3) {
     position: relative;
 }
 
-.task-card.priority-High { border-left-color: var(--priority-high); }
-.task-card.priority-Medium { border-left-color: var(--priority-medium); }
-.task-card.priority-Low { border-left-color: var(--priority-low); }
+.task-card.priority-High { border-left-color: var(--priority-high);
+color: var(--priority-high); }
+.task-card.priority-Medium { border-left-color: var(--priority-medium);
+color: var(--priority-medium) }
+.task-card.priority-Low { border-left-color: var(--priority-low);
+color: var(--priority-low); }
 
 .task-card:hover {
     transform: translateY(-8px);
@@ -476,6 +481,9 @@ table th:nth-child(3), table td:nth-child(3) {
     padding: 8px 14px;
 }
 
+.camel-case {
+    text-transform: capitalize;
+}
 
 @keyframes pulse-shadow {
     0% { box-shadow: 0 0 0 0 rgba(90, 119, 245, 0.7); }
@@ -613,4 +621,18 @@ footer div {
     justify-content: space-between;
     padding: 6px 0;
     border-bottom: 1px dashed #eee;
+}
+
+.popup-success {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
 }

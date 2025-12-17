@@ -1,5 +1,7 @@
 package com.taskreminder.app.Entity;
 
+import enums.TaskPriority;
+import enums.TaskStatus;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,8 +20,10 @@ public class Task {
     private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
-    private String status;
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -27,7 +31,7 @@ public class Task {
 
     public Task(){}
 
-    public Task(String title, String description, LocalDate dueDate, String status, String priority) {
+    public Task(String title, String description, LocalDate dueDate, TaskStatus status, TaskPriority priority) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
@@ -73,19 +77,19 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
-    public String getPriority() {
+    public TaskPriority getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(TaskPriority priority) {
         this.priority = priority;
     }
 
