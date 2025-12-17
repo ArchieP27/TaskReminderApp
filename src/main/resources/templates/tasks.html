@@ -31,7 +31,7 @@
         <form action="/api/tasks" method="get">
             <div>
                 <label>Search Title</label>
-                <input type="text" name="keyword" th:value="${param.keyword}" placeholder="Keyword" />
+                <input type="text" id="searchInput" name="keyword" th:value="${param.keyword}" placeholder="Keyword" autocomplete="off" />
             </div>
             <div>
                 <label>Status</label>

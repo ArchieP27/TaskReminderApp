@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -23,11 +21,11 @@ public class TaskController {
 
     @GetMapping
     public String listTasks(
-        @RequestParam(required = false) String status,
-        @RequestParam(required = false) String priority,
-        @RequestParam(required = false) String keyword,
-        @RequestParam(required = false) String sort,
-        Model model) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort,
+            Model model) {
 
         List<Task> tasks = taskService.getFilteredTasks(status, priority, keyword, sort);
 
@@ -37,29 +35,30 @@ public class TaskController {
 
 
     @GetMapping("/add")
-    public String showAddForm(Model model){
-        model.addAttribute("task",new Task());
+    public String showAddForm(Model model) {
+        model.addAttribute("task", new Task());
         return "add-task";
     }
+
     @PostMapping("/add")
-    public String saveTask(@ModelAttribute Task task, Model model, RedirectAttributes ra){
-        if(task.getTitle()==null || task.getTitle().trim().isEmpty()){
-            model.addAttribute("errorMessage","Title is Required!");
-            model.addAttribute("task",task);
+    public String saveTask(@ModelAttribute Task task, Model model, RedirectAttributes ra) {
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            model.addAttribute("errorMessage", "Title is Required!");
+            model.addAttribute("task", task);
             return "add-task";
         }
-        if(task.getDescription()==null || task.getDescription().trim().isEmpty()){
-            model.addAttribute("errorMessage","Description is Required!");
-            model.addAttribute("task",task);
+        if (task.getDescription() == null || task.getDescription().trim().isEmpty()) {
+            model.addAttribute("errorMessage", "Description is Required!");
+            model.addAttribute("task", task);
             return "add-task";
         }
-        if(task.getDueDate()==null){
-            model.addAttribute("errorMessage","Due Date is Required!");
-            model.addAttribute("task",task);
+        if (task.getDueDate() == null) {
+            model.addAttribute("errorMessage", "Due Date is Required!");
+            model.addAttribute("task", task);
             return "add-task";
         }
         taskService.addTask(task);
-        ra.addFlashAttribute("successMessage","Task added successfully!");
+        ra.addFlashAttribute("successMessage", "Task added successfully!");
         return "redirect:/api/tasks";
     }
 
@@ -69,7 +68,7 @@ public class TaskController {
         if (task == null) {
             return "redirect:/api/tasks";
         }
-        if (task.getStatus()== TaskStatus.COMPLETED) {
+        if (task.getStatus() == TaskStatus.COMPLETED) {
             ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
             return "redirect:/api/tasks";
         }
@@ -79,20 +78,20 @@ public class TaskController {
 
 
     @PostMapping("/update/{id}")
-    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra){
-        if(task.getTitle()==null || task.getTitle().trim().isEmpty()){
-            model.addAttribute("errorMessage","Title is Required!");
-            model.addAttribute("task",task);
+    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra) {
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            model.addAttribute("errorMessage", "Title is Required!");
+            model.addAttribute("task", task);
             return "update-task";
         }
-        if(task.getDueDate()==null){
-            model.addAttribute("errorMessage","Due Date is Required!");
-            model.addAttribute("task",task);
+        if (task.getDueDate() == null) {
+            model.addAttribute("errorMessage", "Due Date is Required!");
+            model.addAttribute("task", task);
             return "update-task";
         }
         task.setId(id);
         Task existing = taskService.findById(id).orElse(null);
-        if(existing!=null)
+        if (existing != null)
             task.setCreatedAt(existing.getCreatedAt());
         else
             task.setCreatedAt(LocalDate.now());
@@ -105,8 +104,16 @@ public class TaskController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTask(@PathVariable Integer id){
+    public String deleteTask(@PathVariable Integer id, Model model, RedirectAttributes ra) {
+        if (taskService.findById(id).isEmpty()) {
+            model.addAttribute("errorMessage", "Task not found!");
+            return "redirect:/api/tasks";
+        }
         taskService.deleteTask(id);
+        ra.addFlashAttribute(
+                "successMessage",
+                "Task deleted successfully!"
+        );
         return "redirect:/api/tasks";
     }
 
@@ -125,5 +132,4 @@ public class TaskController {
         }
         return "redirect:/api/tasks";
     }
-
 }

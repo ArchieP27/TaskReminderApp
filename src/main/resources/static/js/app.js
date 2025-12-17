@@ -160,5 +160,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
-
