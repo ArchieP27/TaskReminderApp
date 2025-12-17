@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -65,13 +66,19 @@ public class TaskController {
     }
 
     @GetMapping("/update/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model){
+    public String showEditForm(@PathVariable Integer id, Model model, RedirectAttributes ra) {
         Task task = taskService.findById(id).orElse(null);
-        if(task==null)
+        if (task == null) {
             return "redirect:/api/tasks";
-        model.addAttribute("task",task);
+        }
+        if ("Completed".equals(task.getStatus())) {
+            ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
+            return "redirect:/api/tasks";
+        }
+        model.addAttribute("task", task);
         return "update-task";
     }
+
 
     @PostMapping("/update/{id}")
     public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra){
@@ -90,7 +97,7 @@ public class TaskController {
         if(existing!=null)
             task.setCreatedAt(existing.getCreatedAt());
         else
-            task.setCreatedAt(LocalDateTime.now());
+            task.setCreatedAt(LocalDate.now());
         taskService.updateTask(task);
         ra.addFlashAttribute(
                 "successMessage",
@@ -105,14 +112,20 @@ public class TaskController {
         return "redirect:/api/tasks";
     }
 
-//    @PostMapping("/markAsDone/{id}")
-//    public String markAsDone(@PathVariable Integer id){
-//        taskService.markTask(id);
-//        return "redirect:/api/tasks";
-//    }
+
     @GetMapping("/markAsDone/{id}")
-    public String markAsDone(@PathVariable Integer id){
-        taskService.markTask(id);
+    public String markAsDone(@PathVariable Integer id, RedirectAttributes ra) {
+        try {
+            taskService.markTask(id);
+            ra.addFlashAttribute(
+                    "successMessage", "Task marked as completed!"
+            );
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute(
+                    "errorMessage", "⚠ " + e.getMessage()
+            );
+        }
         return "redirect:/api/tasks";
     }
+
 }

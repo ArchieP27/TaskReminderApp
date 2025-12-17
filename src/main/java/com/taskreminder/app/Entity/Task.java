@@ -20,7 +20,10 @@ public class Task {
     private LocalDate dueDate;
     private String status;
     private String priority;
-    private LocalDateTime createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate completedAt;
 
     public Task(){}
 
@@ -30,12 +33,12 @@ public class Task {
         this.dueDate = dueDate;
         this.status = status;
         this.priority = priority;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
     }
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = LocalDate.now();
     }
 
     public Integer getId() {
@@ -86,11 +89,15 @@ public class Task {
         this.priority = priority;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
+
+    public LocalDate getCompletedAt() {return completedAt;}
+
+    public void setCompletedAt(LocalDate completedAt) {this.completedAt = completedAt;}
 }

@@ -130,3 +130,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     setActiveView(tableView, tableViewBtn);
 });
+
+function openTaskModal(el) {
+
+    document.getElementById("m-id").innerText = el.dataset.id;
+    document.getElementById("m-title").innerText = el.dataset.title;
+    document.getElementById("m-desc").innerText = el.dataset.desc || "—";
+    document.getElementById("m-due").innerText = el.dataset.duedate;
+    document.getElementById("m-status").innerText = el.dataset.status;
+    document.getElementById("m-priority").innerText = el.dataset.priority;
+    document.getElementById("m-created").innerText = el.dataset.created;
+    document.getElementById("m-completed").innerText =
+        el.dataset.completed ? el.dataset.completed : "Not completed";
+
+    document.getElementById("taskModal").style.display = "flex";
+}
+
+function closeTaskModal() {
+    document.getElementById("taskModal").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskModal");
+    if (modal) {
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
+                closeTaskModal();
+            }
+        });
+    }
+});
+
+

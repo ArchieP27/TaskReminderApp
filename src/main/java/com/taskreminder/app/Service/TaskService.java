@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -35,10 +36,17 @@ public class TaskService {
         return taskRepository.findById(id);
     }
 
+    public void markTask(Integer id) {
 
-    public void markTask(Integer id){
-        Task task = taskRepository.findById(id).orElseThrow(()->new RuntimeException("Task Now Found!"));
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if ("Completed".equals(task.getStatus())) {
+            throw new IllegalStateException("Task is already completed and cannot be marked again.");
+        }
+
         task.setStatus("Completed");
+        task.setCompletedAt(LocalDate.now());
         taskRepository.save(task);
     }
 

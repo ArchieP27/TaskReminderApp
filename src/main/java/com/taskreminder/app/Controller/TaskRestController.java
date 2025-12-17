@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class TaskRestController {
     // CREATE
     @PostMapping
     public ResponseEntity<Task> add(@RequestBody Task task) {
-        task.setCreatedAt(LocalDateTime.now());
+        task.setCreatedAt(LocalDate.now());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(taskService.addTask(task));
     }

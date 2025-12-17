@@ -13,6 +13,11 @@
 </head>
 
 <body>
+<div id="popup"
+     th:if="${errorMessage}"
+     class="popup-error">
+    <span th:text="${errorMessage}"></span>
+</div>
 <div class="container">
     <div class="header-area">
         <h1>Task Reminder Application</h1>
@@ -37,6 +42,7 @@
             <select name="status">
                 <option value="">All</option>
                 <option value="Pending" th:selected="${param.status=='Pending'}">Pending</option>
+                <option value="In Progress" th:selected="${param.status=='In Progress'}">In Progress</option>
                 <option value="Completed" th:selected="${param.status=='Completed'}">Completed</option>
             </select>
         </div>
@@ -81,6 +87,7 @@
             <th>Status</th>
             <th>Priority</th>
             <th>Created At</th>
+            <th>Completed At</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -98,25 +105,58 @@
             </td>
 
             <td th:text="${task.createdAt}"></td>
+            <td th:text="${task.completedAt}"></td>
 
             <td class="action-cell">
-                <div class="action-group-top">
-                    <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
-                        <img th:src="@{/images/pencil.png}" class="icon" alt="Edit">
-                        Edit
-                    </a>
 
-                    <a th:href="@{|/api/tasks/delete/${task.id}|}" class="action-link action-delete"
-                       onclick="return confirm('Are you sure you want to delete this task?');">
-                        <img th:src="@{/images/trash-2.png}" class="icon" alt="Delete">
-                        Delete
-                    </a>
-                </div>
-                <a th:href="@{|/api/tasks/markAsDone/${task.id}|}" class="action-link action-done">
-                    <img th:src="@{/images/check-circle.png}" class="icon" alt="Done">
-                    Mark as Done
-                </a>
-            </td>
+    <!-- TOP ROW: View + Edit + Delete -->
+    <div class="action-group-top">
+
+        <a href="javascript:void(0)"
+           class="action-link action-view"
+           onclick="openTaskModal(this)"
+           th:data-id="${task.id}"
+           th:data-title="${task.title}"
+           th:data-desc="${task.description}"
+           th:data-duedate="${task.dueDate}"
+           th:data-status="${task.status}"
+           th:data-priority="${task.priority}"
+           th:data-created="${task.createdAt}"
+           th:data-completed="${task.completedAt}">
+            <img th:src="@{/images/view.png}" class="icon" alt="View">
+            View
+        </a>
+
+        <a th:href="@{|/api/tasks/update/${task.id}|}"
+           class="action-link action-edit">
+            <img th:src="@{/images/pencil.png}" class="icon" alt="Edit">
+            Edit
+        </a>
+
+        <a th:href="@{|/api/tasks/delete/${task.id}|}"
+           class="action-link action-delete"
+           onclick="return confirm('Are you sure you want to delete this task?');">
+            <img th:src="@{/images/trash-2.png}" class="icon" alt="Delete">
+            Delete
+        </a>
+
+    </div>
+
+    <a th:if="${task.status != 'Completed'}"
+       th:href="@{|/api/tasks/markAsDone/${task.id}|}"
+       class="action-link action-done">
+        <img th:src="@{/images/check-circle.png}" class="icon">
+        Mark as Done
+    </a>
+
+    <span th:if="${task.status == 'Completed'}"
+          class="action-link disabled">
+        ✔ Completed
+    </span>
+
+</td>
+
+
         </tr>
         </tbody>
     </table>
@@ -140,24 +180,50 @@
                 Status: <span class="status-badge" th:classappend="|status-${task.status}|" th:text="${task.status}"></span>
             </div>
 
-            <div class="card-actions">
-                <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
-                    <img th:src="@{/images/pencil.png}" class="icon" alt="Edit">
-                    Edit
-                </a>
+            
+            <div class="card-action-group-top">
 
-                <a th:href="@{|/api/tasks/delete/${task.id}|}" class="action-link action-delete"
-                   onclick="return confirm('Are you sure you want to delete this task?');">
-                    <img th:src="@{/images/trash-2.png}" class="icon" alt="Delete">
-                    Delete
-                </a>
+    <a href="javascript:void(0)"
+       class="action-link action-view"
+       onclick="openTaskModal(this)"
+       th:data-id="${task.id}"
+       th:data-title="${task.title}"
+       th:data-desc="${task.description}"
+       th:data-duedate="${task.dueDate}"
+       th:data-status="${task.status}"
+       th:data-priority="${task.priority}"
+       th:data-created="${task.createdAt}"
+       th:data-completed="${task.completedAt}">
+        <img th:src="@{/images/view.png}" class="icon"> View
+    </a>
 
-                <a th:href="@{|/api/tasks/markAsDone/${task.id}|}" class="action-link action-done">
-                    <img th:src="@{/images/check-circle.png}" class="icon" alt="Done">
-                    Mark as Done
-                </a>
+    <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
+        <img th:src="@{/images/pencil.png}" class="icon"> Edit
+    </a>
 
-            </div>
+    <a th:href="@{|/api/tasks/delete/${task.id}|}"
+       class="action-link action-delete"
+       onclick="return confirm('Are you sure you want to delete this task?');">
+        <img th:src="@{/images/trash-2.png}" class="icon"> Delete
+    </a>
+
+</div>
+
+<div class="card-actions-bottom">
+    <a th:if="${task.status != 'Completed'}"
+       th:href="@{|/api/tasks/markAsDone/${task.id}|}"
+       class="action-link action-done">
+        <img th:src="@{/images/check-circle.png}" class="icon">
+        Mark as Done
+    </a>
+
+    <span th:if="${task.status == 'Completed'}"
+          class="action-link disabled">
+        ✔ Completed
+    </span>
+</div>
+
+
         </div>
     </div>
 
@@ -173,6 +239,24 @@
     </div>
     <div>Task Reminder App &copy; 2025 - Created By Archie</div>
 </footer>
+
+<div id="taskModal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="modal-close" onclick="closeTaskModal()">×</span>
+
+        <h2>Task Details</h2>
+
+        <div class="modal-row"><strong>ID:</strong> <span id="m-id"></span></div>
+        <div class="modal-row"><strong>Title:</strong> <span id="m-title"></span></div>
+        <div class="modal-row"><strong>Description:</strong> <span id="m-desc"></span></div>
+        <div class="modal-row"><strong>Due Date:</strong> <span id="m-due"></span></div>
+        <div class="modal-row"><strong>Status:</strong> <span id="m-status"></span></div>
+        <div class="modal-row"><strong>Priority:</strong> <span id="m-priority"></span></div>
+        <div class="modal-row"><strong>Created At:</strong> <span id="m-created"></span></div>
+        <div class="modal-row"><strong>Completed At:</strong> <span id="m-completed"></span></div>
+    </div>
+</div>
+
 
 </body>
 </html>
