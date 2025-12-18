@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    console.log("DOM Content Loaded: Starting script execution.");
-    console.log("Raw tasksData from Thymeleaf:", tasksData);
-
     const tableView = document.getElementById('tableView');
     const cardView = document.getElementById('cardView');
     const calendarView = document.getElementById('calendarView');
@@ -42,8 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function initializeCalendar() {
-        console.log("initializeCalendar function started.");
-
         if (calendarInstance) {
             setActiveView(calendarView, calendarViewBtn);
             setTimeout(() => calendarInstance.updateSize(), 1);
@@ -67,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const m = String(dueDate.monthValue).padStart(2, '0');
                     const d = String(dueDate.dayOfMonth).padStart(2, '0');
                     dateString = `${y}-${m}-${d}`;
-                    console.log(`Converted Object Date: ${dateString}`);
                 }
 
                 else if (Array.isArray(dueDate)) {
@@ -90,8 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .filter(e => e !== null);
 
-        console.log("FullCalendar Events being loaded:", events);
-
         calendarInstance = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             height: 'auto',
@@ -112,7 +104,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         calendarInstance.render();
         setActiveView(calendarView, calendarViewBtn);
-        console.log("Calendar instance created and rendered.");
     }
 
     tableViewBtn.addEventListener('click', () => {
@@ -124,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendarViewBtn.addEventListener('click', () => {
-        console.log("CALENDAR VIEW BUTTON ACTIVATED!");
         initializeCalendar();
     });
 

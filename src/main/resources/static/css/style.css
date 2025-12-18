@@ -102,14 +102,52 @@ h1 {
     font-size: 2.5em;
     font-weight: 800;
     letter-spacing: -1px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 
     padding: 15px 25px;
     background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
+
     border: 1px solid rgba(90, 119, 245, 0.3);
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+
     animation: floating-pulse 3s ease-in-out infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.logo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+
+    border-radius: 10px;
+    padding: 6px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(90, 119, 245, 0.15),
+        rgba(90, 119, 245, 0.05)
+    );
+
+    box-shadow: inset 0 0 0 1px rgba(90, 119, 245, 0.2);
+}
+
+@keyframes floating-pulse {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
 }
 
 a {
@@ -195,9 +233,7 @@ form select:focus {
     outline: none;
 }
 
-form button[type="submit"],
-form input[type="submit"],
-.clear-btn {
+.filter-btn {
     padding: 0;
     border-radius: 10px;
     cursor: pointer;
@@ -217,15 +253,26 @@ form input[type="submit"],
     box-sizing: border-box;
 }
 
-form input[type="submit"] {
-    background: linear-gradient(45deg, #FFC107 0%, var(--color-warning) 100%);
-    color: var(--color-text-dark);
-}
-
-form input[type="submit"]:hover {
-    background: linear-gradient(45deg, #FFD54F 0%, #FFA000 100%);
-    transform: translateY(-3px) scale(1.01);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+form button[type="submit"],
+form input[type="submit"],
+.clear-btn,.apply-btn {
+    padding: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: none;
+    min-width: 150px;
+    flex: 1 1 calc((100% - (5 * 20px)) / 6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 50px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    color: white;
+    text-decoration: none;
+    box-sizing: border-box;
 }
 
 .clear-btn {
@@ -234,6 +281,16 @@ form input[type="submit"]:hover {
 
 .clear-btn:hover {
     background: linear-gradient(45deg, #FF8A8A 0%, #D32F2F 100%);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.apply-btn {
+    background: linear-gradient(45deg, #FFC107 0%, var(--color-warning) 100%);
+}
+
+.apply-btn:hover {
+    background: linear-gradient(45deg, #FFD54F 0%, #FFA000 100%);
     transform: translateY(-3px) scale(1.01);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }

@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Task Reminder Application</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Edit Task</title>
     <link rel="stylesheet" href="/css/style.css">
     <script th:inline="javascript">
-        const tasksData = [[${ tasks }]];
+        const tasksData = /*[[${tasks}]]*/[];
     </script>
     <script src="/js/app.js" defer></script>
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script th:src="@{/vendor/fullcalendar/index.global.min.js}"></script>
 </head>
 
 <body>
@@ -18,7 +20,10 @@
     </div>
     <div class="container">
         <div class="header-area">
-            <h1>Task Reminder Application</h1>
+            <div class="logo">
+                <img src="/images/logo.png" class="logo-icon" alt="Logo">
+                <h1>Task Reminder Application</h1>
+            </div>
             <a href="tasks/add" class="action-btn add-task-btn">
                 <img th:src="@{/images/plus.png}" class="icon" alt="Add">
                 Add New Task
@@ -30,12 +35,13 @@
 
         <form action="/api/tasks" method="get">
             <div>
-                <label>Search Title</label>
-                <input type="text" id="searchInput" name="keyword" th:value="${param.keyword}" placeholder="Keyword" autocomplete="off" />
+                <label for="searchInput">Search Title</label>
+                <input type="text" id="searchInput" name="keyword" th:value="${param.keyword}" placeholder="Keyword"
+                    autocomplete="off" />
             </div>
             <div>
-                <label>Status</label>
-                <select name="status">
+                <label for="status">Status</label>
+                <select name="status" id="status">
                     <option value="">All</option>
                     <option th:each="s : ${T(enums.TaskStatus).values()}" th:value="${s}"
                         th:selected="${param.status == s.name()}" th:text="${s.label}">
@@ -43,8 +49,8 @@
                 </select>
             </div>
             <div>
-                <label>Priority</label>
-                <select name="priority">
+                <label for="priority">Priority</label>
+                <select name="priority" id="priority">
                     <option value="">All</option>
                     <option th:each="p : ${T(enums.TaskPriority).values()}" th:value="${p}"
                         th:selected="${param.priority == p.name()}" th:text="${p.label}">
@@ -53,8 +59,8 @@
 
             </div>
             <div>
-                <label>Sort By</label>
-                <select name="sort">
+                <label for="sort">Sort By</label>
+                <select name="sort" id="sort">
                     <option value="">None</option>
                     <option value="dueDate" th:selected="${param.sort=='dueDate'}">Due Date</option>
                     <option value="priority" th:selected="${param.sort=='priority'}">Priority</option>
@@ -62,11 +68,13 @@
                     <option value="title" th:selected="${param.sort=='title'}">Title</option>
                 </select>
             </div>
-            <a href="/api/tasks" class="clear-btn" title="Clear Filters">
+            <a href="/api/tasks" class="filter-btn clear-btn" title="Clear Filters">
                 <img th:src="@{/images/trash.png}" class="icon" alt="Clear">
                 Clear Filters
             </a>
-            <input type="submit" value="Apply Filters">
+
+            <input type="submit" value="Apply Filters" class="filter-btn apply-btn">
+
         </form>
 
         <div class="view-toggle">
@@ -100,9 +108,6 @@
                             th:classappend="|status-${#strings.toLowerCase(#strings.replace(task.status.label, ' ', '_'))}|"
                             th:text="${task.status.label}">
                         </span>
-
-                        </span>
-
                     </td>
                     <td>
                         <span class="priority-badge" th:classappend="|priority-${task.priority.label}|"
@@ -110,7 +115,7 @@
                     </td>
 
                     <td th:text="${task.createdAt}"></td>
-                    <td th:text="${task.completedAt}"></td>
+                    <td th:text="${task.completedAt != null ? task.completedAt : '--'}"></td>
 
                     <td class="action-cell">
 
@@ -140,7 +145,7 @@
 
                         <a th:if="${task.status.label != 'Completed'}" th:href="@{|/api/tasks/markAsDone/${task.id}|}"
                             class="action-link action-done">
-                            <img th:src="@{/images/check-circle.png}" class="icon">
+                            <img th:src="@{/images/check-circle.png}" class="icon" alt="check-mark">
                             Mark as Done
                         </a>
 
@@ -173,9 +178,6 @@
                         th:classappend="|status-${#strings.toLowerCase(#strings.replace(task.status.label, ' ', '_'))}|"
                         th:text="${task.status.label}">
                     </span>
-
-                    </span>
-
                 </div>
 
 
@@ -186,16 +188,16 @@
                         th:data-duedate="${task.dueDate}" th:data-status="${task.status.label}"
                         th:data-priority="${task.priority.label}" th:data-created="${task.createdAt}"
                         th:data-completed="${task.completedAt}">
-                        <img th:src="@{/images/view.png}" class="icon"> View
+                        <img th:src="@{/images/view.png}" class="icon" alt="view-icon"> View
                     </a>
 
                     <a th:href="@{|/api/tasks/update/${task.id}|}" class="action-link action-edit">
-                        <img th:src="@{/images/pencil.png}" class="icon"> Edit
+                        <img th:src="@{/images/pencil.png}" class="icon" alt="edit-image"> Edit
                     </a>
 
                     <a th:href="@{|/api/tasks/delete/${task.id}|}" class="action-link action-delete"
                         onclick="return confirm('Are you sure you want to delete this task?');">
-                        <img th:src="@{/images/trash-2.png}" class="icon"> Delete
+                        <img th:src="@{/images/trash-2.png}" class="icon" alt="trash-bin"> Delete
                     </a>
 
                 </div>
@@ -203,7 +205,7 @@
                 <div class="card-actions-bottom">
                     <a th:if="${task.status.label != 'Completed'}" th:href="@{|/api/tasks/markAsDone/${task.id}|}"
                         class="action-link action-done">
-                        <img th:src="@{/images/check-circle.png}" class="icon">
+                        <img th:src="@{/images/check-circle.png}" class="icon" alt="check-icon">
                         Mark as Done
                     </a>
 
