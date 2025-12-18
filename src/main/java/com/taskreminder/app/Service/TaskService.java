@@ -2,6 +2,7 @@ package com.taskreminder.app.Service;
 
 import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Repository.TaskRepository;
+import enums.TaskPriority;
 import enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,60 +48,54 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public List<Task> getFilteredTasks(String status, String priority, String keyword, String sort) {
+    public Page<Task> getPagedTasks(
+            Pageable pageable,
+            TaskStatus status,
+            TaskPriority priority,
+            String keyword
+    ) {
 
-        List<Task> tasks = taskRepository.findAll();
+        boolean hasStatus = status != null;
+        boolean hasPriority = priority != null;
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
 
-        if (status != null && !status.isEmpty()) {
-            tasks = tasks.stream()
-                    .filter(t -> t.getStatus().name().equalsIgnoreCase(status))
-                    .toList();
-        }
-        if (priority != null && !priority.isEmpty()) {
-            tasks = tasks.stream()
-                    .filter(t -> t.getPriority().name().equalsIgnoreCase(priority))
-                    .toList();
-        }
-        if (keyword != null && !keyword.isEmpty()) {
-            tasks = tasks.stream()
-                    .filter(t -> t.getTitle().toLowerCase().contains(keyword.toLowerCase()))
-                    .toList();
+        if (hasStatus && hasPriority && hasKeyword) {
+            return taskRepository
+                    .findByStatusAndPriorityAndTitleContainingIgnoreCase(
+                            status, priority, keyword, pageable);
         }
 
-        if (sort != null && !sort.isEmpty()) {
-            switch (sort) {
-                case "dueDate" -> tasks = tasks.stream()
-                        .sorted(Comparator.comparing(Task::getDueDate))
-                        .toList();
-                case "priority" -> tasks = tasks.stream()
-                        .sorted(Comparator.comparing(Task::getPriority))
-                        .toList();
-                case "createdAt" -> tasks = tasks.stream()
-                        .sorted(Comparator.comparing(Task::getCreatedAt))
-                        .toList();
-                case "title" -> tasks = tasks.stream()
-                        .sorted(Comparator.comparing(Task::getTitle))
-                        .toList();
-            }
+        if (hasStatus && hasPriority) {
+            return taskRepository
+                    .findByStatusAndPriority(status, priority, pageable);
         }
 
-        return tasks;
-    }
+        if (hasStatus && hasKeyword) {
+            return taskRepository
+                    .findByStatusAndTitleContainingIgnoreCase(
+                            status, keyword, pageable);
+        }
 
-    public List<Task> findByStatus(String status){
-        return taskRepository.findByStatus(status);
-    }
+        if (hasPriority && hasKeyword) {
+            return taskRepository
+                    .findByPriorityAndTitleContainingIgnoreCase(
+                            priority, keyword, pageable);
+        }
 
-    public List<Task> findByPriority(String priority){
-        return taskRepository.findByPriority(priority);
-    }
+        if (hasStatus) {
+            return taskRepository.findByStatus(status, pageable);
+        }
 
-    public List<Task> findByDueDate(String dueDate){
-        return taskRepository.findByDueDate(dueDate);
-    }
+        if (hasPriority) {
+            return taskRepository.findByPriority(priority, pageable);
+        }
 
-    public List<Task> searchByTitle(String keyword){
-        return taskRepository.findByTitleContainingIgnoreCase(keyword);
+        if (hasKeyword) {
+            return taskRepository
+                    .findByTitleContainingIgnoreCase(keyword, pageable);
+        }
+
+        return taskRepository.findAll(pageable);
     }
 
     public Page<Task> findAll(Pageable pageable) {

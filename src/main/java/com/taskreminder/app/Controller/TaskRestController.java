@@ -2,6 +2,7 @@ package com.taskreminder.app.Controller;
 
 import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Service.TaskService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -9,14 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
 public class TaskRestController {
 
+    @Autowired
     private final TaskService taskService;
 
+    @Autowired
     public TaskRestController(TaskService taskService) {
         this.taskService = taskService;
     }
@@ -65,25 +67,25 @@ public class TaskRestController {
     }
 
     // FILTERS
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<Task>> getByStatus(@PathVariable String status) {
-        return ResponseEntity.ok(taskService.findByStatus(status));
-    }
-
-    @GetMapping("/priority/{priority}")
-    public ResponseEntity<List<Task>> getByPriority(@PathVariable String priority) {
-        return ResponseEntity.ok(taskService.findByPriority(priority));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<Task>> search(@RequestParam String keyword) {
-        return ResponseEntity.ok(taskService.searchByTitle(keyword));
-    }
-
-    @GetMapping("/due")
-    public ResponseEntity<List<Task>> getByDueDate(@RequestParam String date) {
-        return ResponseEntity.ok(taskService.findByDueDate(date));
-    }
+//    @GetMapping("/status/{status}")
+//    public ResponseEntity<Page<Task>> getByStatus(@PathVariable String status) {
+//        return ResponseEntity.ok(taskService.findByStatus(status));
+//    }
+//
+//    @GetMapping("/priority/{priority}")
+//    public ResponseEntity<Page<Task>> getByPriority(@PathVariable String priority) {
+//        return ResponseEntity.ok(taskService.findByPriority(priority));
+//    }
+//
+//    @GetMapping("/search")
+//    public ResponseEntity<Page<Task>> search(@RequestParam String keyword) {
+//        return ResponseEntity.ok(taskService.searchByTitle(keyword));
+//    }
+//
+//    @GetMapping("/due")
+//    public ResponseEntity<Page<Task>> getByDueDate(@RequestParam String date) {
+//        return ResponseEntity.ok(taskService.findByDueDate(date));
+//    }
 
     // MARK AS DONE
     @PatchMapping("/{id}/done")

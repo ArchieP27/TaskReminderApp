@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Edit Task</title>
+    <title>Task Reminder Application</title>
     <link rel="stylesheet" href="/css/style.css">
     <script th:inline="javascript">
-        const tasksData = /*[[${tasks}]]*/[];
+        const tasksData = /*[[${view == 'calendar' ? tasks : null}]]*/ null;
     </script>
     <script src="/js/app.js" defer></script>
     <script th:src="@{/vendor/fullcalendar/index.global.min.js}"></script>
@@ -78,12 +79,33 @@
         </form>
 
         <div class="view-toggle">
-            <button id="tableViewBtn" class="active">Table View</button>
-            <button id="cardViewBtn">Card View</button>
-            <button id="calendarViewBtn">Calendar View</button>
+            <a th:href="@{/api/tasks(
+        page=${currentPage},
+        size=${size},
+        keyword=${param.keyword},
+        status=${param.status},
+        priority=${param.priority},
+        sort=${param.sort},
+        view='table'
+)}" id="tableViewBtn" th:classappend="${view == 'table'} ? 'active'" class="view-btn">Table View</a>
+
+            <a th:href="@{/api/tasks(
+        page=${currentPage},
+        size=${size},
+        keyword=${param.keyword},
+        status=${param.status},
+        priority=${param.priority},
+        sort=${param.sort},
+        view='card'
+)}" id="cardViewBtn" th:classappend="${view == 'card'} ? 'active'" class="view-btn">Card View</a>
+
+            <a th:href="@{/api/tasks(
+        view='calendar'
+)}" id="calendarViewBtn" th:classappend="${view == 'calendar'} ? 'active'" class="view-btn">Calendar View</a>
+
         </div>
 
-        <table id="tableView">
+        <table id="tableView" th:if="${view=='table'}">
             <thead>
                 <tr>
                     <th>Id</th>
@@ -159,7 +181,7 @@
             </tbody>
         </table>
 
-        <div id="cardView" class="card-view" style="display:none;">
+        <div id="cardView" class="card-view" th:if="${view == 'card'}">
             <div th:each="task : ${tasks}" th:class="|task-card priority-${task.priority.label}|">
 
                 <div class="card-title camel-case" th:text="${task.title}">Task Title</div>
@@ -217,7 +239,38 @@
             </div>
         </div>
 
-        <div id="calendarView" class="calendar-view" style="display:none;">
+        <div id="paginationWrapper" class="pagination" th:if="${totalPages > 1 and view != 'calendar'}">
+            <a th:if="${currentPage > 0}" th:href="@{/api/tasks(
+            page=${currentPage - 1},
+            size=${size},
+            keyword=${param.keyword},
+            status=${param.status},
+            priority=${param.priority},
+            sort=${param.sort},
+            view=${param.view}
+       )}" class="btn">
+                Previous
+            </a>
+
+            <span>
+                Page <span th:text="${currentPage + 1}"></span>
+                of <span th:text="${totalPages}"></span>
+            </span>
+
+            <a th:if="${currentPage < totalPages - 1}" th:href="@{/api/tasks(
+            page=${currentPage + 1},
+            size=${size},
+            keyword=${param.keyword},
+            status=${param.status},
+            priority=${param.priority},
+            sort=${param.sort},
+            view=${param.view}
+       )}" class="btn">
+                Next
+            </a>
+        </div>
+
+        <div id="calendarView" class="calendar-view" th:if="${view == 'calendar'}">
             <div id='taskCalendar'></div>
         </div>
 
@@ -246,7 +299,6 @@
             <div class="modal-row"><strong>Completed At:</strong> <span id="m-completed"></span></div>
         </div>
     </div>
-
 </body>
 
 </html>

@@ -2,8 +2,13 @@ package com.taskreminder.app.Controller;
 
 import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Service.TaskService;
+import enums.TaskPriority;
 import enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/api/tasks")
@@ -21,17 +27,42 @@ public class TaskController {
 
     @GetMapping
     public String listTasks(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String priority,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) TaskPriority priority,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
-            Model model) {
-
-        List<Task> tasks = taskService.getFilteredTasks(status, priority, keyword, sort);
-
-        model.addAttribute("tasks", tasks);
+            @RequestParam(defaultValue = "table") String view,
+            Model model
+    ) {
+        Sort sortObj = Sort.unsorted();
+        if (sort != null && !sort.isBlank()) {
+            switch (sort) {
+                case "dueDate" -> sortObj = Sort.by("dueDate");
+                case "priority" -> sortObj = Sort.by("priority");
+                case "createdAt" -> sortObj = Sort.by("createdAt");
+                case "title" -> sortObj = Sort.by("title");
+            }
+        }
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+        Page<Task> taskPage =
+                taskService.getPagedTasks(pageable, status, priority, keyword);
+        model.addAttribute("tasks", taskPage.getContent());
+        model.addAttribute("taskPage", taskPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", taskPage.getTotalPages());
+        model.addAttribute("size", size);
+        model.addAttribute("sort", sort);
+        model.addAttribute("view", view);
+        List<Integer> pageNumbers =
+                IntStream.range(0, taskPage.getTotalPages())
+                        .boxed()
+                        .toList();
+        model.addAttribute("pageNumbers", pageNumbers);
         return "tasks";
     }
+
 
 
     @GetMapping("/add")
@@ -95,6 +126,8 @@ public class TaskController {
             task.setCreatedAt(existing.getCreatedAt());
         else
             task.setCreatedAt(LocalDate.now());
+        if(task.getStatus() == TaskStatus.COMPLETED)
+            task.setCompletedAt(LocalDate.now());
         taskService.updateTask(task);
         ra.addFlashAttribute(
                 "successMessage",
