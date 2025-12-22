@@ -18,6 +18,10 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    public List<Task> getAllTasks(){
+        return taskRepository.findAll();
+    }
+
     public Task addTask(Task  task){
         return taskRepository.save(task);
     }
@@ -101,4 +105,5 @@ public class TaskService {
     public Page<Task> findAll(Pageable pageable) {
         return taskRepository.findAll(pageable);
     }
+
 }

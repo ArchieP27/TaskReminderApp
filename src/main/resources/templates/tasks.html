@@ -26,7 +26,7 @@
                 <img src="/images/logo.png" class="logo-icon" alt="Logo">
                 <h1>Task Reminder Application</h1>
             </div>
-            <a href="tasks/add" class="action-btn add-task-btn">
+            <a href="/api/tasks/add" class="action-btn add-task-btn">
                 <img th:src="@{/images/plus.png}" class="icon" alt="Add">
                 Add New Task
             </a>
@@ -70,6 +70,17 @@
                     <option value="title" th:selected="${param.sort=='title'}">Title</option>
                 </select>
             </div>
+            <input type="hidden" name="page" value="0">
+            <div th:if="${view == 'table'}">
+                <label for="size">Tasks per page</label>
+                <select name="size" id="size" onchange="this.form.submit()">
+                    <option value="5"  th:selected="${size == 5}">5</option>
+                    <option value="10" th:selected="${size == 10}">10</option>
+                    <option value="15" th:selected="${size == 15}">15</option>
+                    <option value="25" th:selected="${size == 25}">25</option>
+                    <option value="9999" th:selected="${size >= 9999}">All</option>
+                </select>
+            </div>
             <a href="/api/tasks" class="filter-btn clear-btn" title="Clear Filters">
                 <img th:src="@{/images/trash.png}" class="icon" alt="Clear">
                 Clear Filters
@@ -81,7 +92,7 @@
 
         <div class="view-toggle">
             <a th:href="@{/api/tasks(
-        page=${currentPage},
+        page=0,
         size=${size},
         keyword=${param.keyword},
         status=${param.status},
@@ -91,7 +102,7 @@
 )}" id="tableViewBtn" th:classappend="${view == 'table'} ? 'active'" class="view-btn">Table View</a>
 
             <a th:href="@{/api/tasks(
-        page=${currentPage},
+        page=0,
         size=${size},
         keyword=${param.keyword},
         status=${param.status},
@@ -193,7 +204,7 @@
                 </div>
 
                 <div class="card-detail">
-                    Priority: <span><strong th:text="${task.priority}"></strong></span>
+                    Priority: <span><strong th:text="${task.priority.label}"></strong></span>
                 </div>
 
                 <div class="card-detail">
@@ -240,7 +251,7 @@
             </div>
         </div>
 
-        <div id="paginationWrapper" class="pagination" th:if="${totalPages > 1 and view != 'calendar'}">
+        <div id="paginationWrapper" class="pagination" th:if="${totalPages > 1 and view != 'calendar' and size < 9999}">
             <a th:if="${currentPage > 0}" th:href="@{/api/tasks(
             page=${currentPage - 1},
             size=${size},

@@ -28,7 +28,7 @@ public class TaskController {
     @GetMapping
     public String listTasks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) Integer size,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) TaskPriority priority,
             @RequestParam(required = false) String keyword,
@@ -45,25 +45,32 @@ public class TaskController {
                 case "title" -> sortObj = Sort.by("title");
             }
         }
-        Pageable pageable = PageRequest.of(page, size, sortObj);
+
+        int pageSize;
+        if ("card".equals(view)) {
+            pageSize = 6;
+        } else if (size != null && size >= 9999) {
+            pageSize = Integer.MAX_VALUE;
+            page = 0;
+        } else if (size == null) {
+            pageSize = 5;
+        } else {
+            pageSize = size;
+        }
+
+
+        Pageable pageable = PageRequest.of(page, pageSize, sortObj);
         Page<Task> taskPage =
                 taskService.getPagedTasks(pageable, status, priority, keyword);
+
         model.addAttribute("tasks", taskPage.getContent());
-        model.addAttribute("taskPage", taskPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", taskPage.getTotalPages());
-        model.addAttribute("size", size);
-        model.addAttribute("sort", sort);
+        model.addAttribute("size", pageSize);
         model.addAttribute("view", view);
-        List<Integer> pageNumbers =
-                IntStream.range(0, taskPage.getTotalPages())
-                        .boxed()
-                        .toList();
-        model.addAttribute("pageNumbers", pageNumbers);
+
         return "tasks";
     }
-
-
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
