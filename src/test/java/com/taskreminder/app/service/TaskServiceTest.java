@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,6 +121,121 @@ public class TaskServiceTest {
                 exception.getMessage()
         );
         verify(taskRepository, never()).save(any());
+    }
+
+    @Test
+    void testGetTasksDueTodaySuccess() {
+        LocalDate today = LocalDate.now();
+
+        Task task1 = new Task();
+        task1.setStatus(TaskStatus.PENDING);
+
+        Task task2 = new Task();
+        task2.setStatus(TaskStatus.IN_PROGRESS);
+
+        when(taskRepository.findByDueDateAndStatusNot(
+                today,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of(task1, task2));
+
+        List<Task> result = taskService.getTasksDueToday();
+
+        assertEquals(2, result.size());
+        verify(taskRepository, times(1))
+                .findByDueDateAndStatusNot(today, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    void testGetTasksDueTodayEmpty() {
+        LocalDate today = LocalDate.now();
+
+        when(taskRepository.findByDueDateAndStatusNot(
+                today,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of());
+
+        List<Task> result = taskService.getTasksDueToday();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(taskRepository, times(1))
+                .findByDueDateAndStatusNot(today, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    void testGetUpcomingTasksSuccess() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(5);
+
+        Task task = new Task();
+        task.setStatus(TaskStatus.PENDING);
+
+        when(taskRepository.findByDueDateBetweenAndStatusNot(
+                today,
+                end,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of(task));
+
+        List<Task> result = taskService.getUpcomingTasks(5);
+
+        assertEquals(1, result.size());
+        verify(taskRepository, times(1))
+                .findByDueDateBetweenAndStatusNot(today, end, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    void testGetUpcomingTasksEmpty() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(3);
+
+        when(taskRepository.findByDueDateBetweenAndStatusNot(
+                today,
+                end,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of());
+
+        List<Task> result = taskService.getUpcomingTasks(3);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(taskRepository, times(1))
+                .findByDueDateBetweenAndStatusNot(today, end, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    void testGetOverdueTasksSuccess() {
+        LocalDate today = LocalDate.now();
+
+        Task overdueTask = new Task();
+        overdueTask.setStatus(TaskStatus.IN_PROGRESS);
+
+        when(taskRepository.findByDueDateBeforeAndStatusNot(
+                today,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of(overdueTask));
+
+        List<Task> result = taskService.getOverdueTasks();
+
+        assertEquals(1, result.size());
+        verify(taskRepository, times(1))
+                .findByDueDateBeforeAndStatusNot(today, TaskStatus.COMPLETED);
+    }
+
+    @Test
+    void testGetOverdueTasksEmpty() {
+        LocalDate today = LocalDate.now();
+
+        when(taskRepository.findByDueDateBeforeAndStatusNot(
+                today,
+                TaskStatus.COMPLETED
+        )).thenReturn(List.of());
+
+        List<Task> result = taskService.getOverdueTasks();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(taskRepository, times(1))
+                .findByDueDateBeforeAndStatusNot(today, TaskStatus.COMPLETED);
     }
 
 }

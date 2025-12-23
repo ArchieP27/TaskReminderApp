@@ -1,78 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Edit Task</title>
     <link rel="stylesheet" href="/css/add.css" />
-    <link rel="icon" type="image/png" href="/images/logo.png">
-</head>
-<body>
-
-<header class="page-header">
-    <div class="page-header-content">
-        <h1>Edit Task</h1>
-        <a href="/api/tasks" class="back-link">Back to Task List</a>
-    </div>
-</header>
-
-<div class="form-container">
-    <div th:if="${errorMessage}" class="error-message">
-        <p th:text="${errorMessage}"></p>
-    </div>
-
-    <form th:action="@{|/api/tasks/update/${task.id}|}" th:object="${task}" method="post">
-        <div>
-            <label for="title">Title</label>
-            <input type="text" id="title" th:field="*{title}" required minlength="3" maxlength="50" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <header class="hero-header">
+        <div class="header-content">
+          <div class="logo">
+            <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+            <h1>Task Reminder Application</h1>
+          </div>
+          <div class="header-actions">
+            <a href="/api/tasks" class="back-link"
+              ><span>&larr;</span> Back to Task List</a
+            >
+          </div>
         </div>
+      </header>
 
-        <div>
-            <label for="description">Description</label>
-            <input type="text" id="description" th:field="*{description}" required maxlength="500" />
-        </div>
-
-        <div>
-            <label for="dueDate">Due Date</label>
-            <input type="date" id="dueDate" th:field="*{dueDate}" />
-        </div>
-
-        <div class="form-group-grid">
-            <div>
-                <label for="priority">Priority</label>
-                <select th:field="*{priority}" id="priority">
-                    <option th:each="p : ${T(enums.TaskPriority).values()}"
-                            th:value="${p}" th:text="${p.label}">
-                    </option>
-                </select>
+      <div class="content-body">
+        <div class="form-container">
+          <div class="form-sidebar">
+            <div class="sidebar-top">
+              <span class="status-dot"></span>
+              <span class="badge">Editor Mode</span>
             </div>
-
-            <div>
-                <label for="status">Status</label>
-                <select th:field="*{status}" id="status">
-                    <option th:each="s : ${T(enums.TaskStatus).values()}"
-                            th:value="${s}" th:text="${s.label}">
-                    </option>
-                </select>
+            <div class="sidebar-text">
+              <h2>Modify Task</h2>
+              <p>
+                Adjust the details of your task. Changes will be updated
+                immediately across your dashboard.
+              </p>
             </div>
+            <div class="decoration-element"></div>
+          </div>
+
+          <div class="form-main-content">
+            <form
+              th:action="@{|/api/tasks/update/${task.id}|}"
+              th:object="${task}"
+              method="post"
+            >
+              <div class="form-group">
+                <label for="title">Task Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  th:field="*{title}"
+                  required
+                  minlength="3"
+                  maxlength="50"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="description">Description</label>
+                <input
+                  type="text"
+                  id="description"
+                  th:field="*{description}"
+                  required
+                  maxlength="500"
+                />
+              </div>
+
+              <div class="form-row action-row">
+                <div class="form-group flex-1">
+                  <label for="dueDate">Due Date</label>
+                  <input type="date" id="dueDate" th:field="*{dueDate}" />
+                </div>
+                <div class="form-group flex-1">
+                  <label for="priority">Priority</label>
+                  <select th:field="*{priority}" id="priority">
+                    <option
+                      th:each="p : ${T(enums.TaskPriority).values()}"
+                      th:value="${p}"
+                      th:text="${p.label}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="status">Status</label>
+                  <select th:field="*{status}" id="status">
+                    <option
+                      th:each="s : ${T(enums.TaskStatus).values()}"
+                      th:value="${s}"
+                      th:text="${s.label}"
+                    ></option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <input
+                    type="submit"
+                    value="Update Task"
+                    class="submit-btn update-btn"
+                  />
+                </div>
+              </div>
+              <div class="cancel-container">
+                <a th:href="@{/api/tasks}" class="cancel-link"
+                  >Discard Changes</a
+                >
+              </div>
+            </form>
+          </div>
         </div>
-        <input type="submit" value="Update Task" class="update-btn" />
-    </form>
+      </div>
+    </div>
 
-    <p style="text-align: center; margin-top: 20px;">
-        <a th:href="@{/api/tasks}" class="cancel-link">Cancel</a>
-    </p>
-
-</div>
-
-<footer>
-    <div class="clock-icon-container">
+    <footer class="fixed-footer">
+      <div class="clock-icon-container">
         <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time" />
-    </div>
-    <div>Task Reminder App &copy; 2025 - Created By Archie</div>
-</footer>
-
-</body>
+      </div>
+      <div class="footer-text">
+        Task Reminder App &copy; 2025 - Created By Archie
+      </div>
+    </footer>
+  </body>
 </html>

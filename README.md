@@ -65,13 +65,13 @@ The application allows users to **add, edit, delete, and view tasks** using mult
 ## 📂 Project Structure
 
 ```text
-task-manager/
+app/
 ├── src/main/java
-│   └── com.example.taskmanager
+│   └── com.taskreminder.app
 │       ├── controller
 │       ├── service
 │       ├── repository
-│       └── model
+│       └── entity
 │
 ├── src/main/resources
 │   ├── static
@@ -80,7 +80,7 @@ task-manager/
 │   └── templates
 │       ├── tasks.html
 │       ├── add-task.html
-│       └── edit-task.html
+│       └── update-task.html
 │
 └── application.properties
 ```
@@ -97,12 +97,12 @@ task-manager/
 ### Steps to run
 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/task-manager.git
+git clone https://github.com/ArchieP27/TaskReminderApp.git
 ```
 2. Open the project in an IDE.
 3. Configure database in application.properties.
 ```bash
-spring.datasource.url=jdbc:mysql://localhost:3306/taskdb
+spring.datasource.url=jdbc:mysql://localhost:3306/task_app
 spring.datasource.username=root
 spring.datasource.password=yourpassword
 ```

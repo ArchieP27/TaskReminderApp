@@ -106,4 +106,19 @@ public class TaskService {
         return taskRepository.findAll(pageable);
     }
 
+    public List<Task> getTasksDueToday() {
+        LocalDate today = LocalDate.now();
+        return taskRepository.findByDueDateAndStatusNot(today,TaskStatus.COMPLETED);
+    }
+
+    public List<Task> getUpcomingTasks(int days) {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(days);
+        return taskRepository.findByDueDateBetweenAndStatusNot(today,end,TaskStatus.COMPLETED);
+    }
+
+    public List<Task> getOverdueTasks() {
+        LocalDate today = LocalDate.now();
+        return taskRepository.findByDueDateBeforeAndStatusNot(today,TaskStatus.COMPLETED);
+    }
 }

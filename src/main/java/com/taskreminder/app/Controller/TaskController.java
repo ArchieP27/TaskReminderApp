@@ -58,6 +58,14 @@ public class TaskController {
             pageSize = size;
         }
 
+        if ("calendar".equals(view)) {
+            List<Task> tasks = taskService.getAllTasks();
+            model.addAttribute("tasks", tasks);
+
+            model.addAttribute("view", view);
+            model.addAttribute("size", pageSize);
+            return "tasks";
+        }
 
         Pageable pageable = PageRequest.of(page, pageSize, sortObj);
         Page<Task> taskPage =
@@ -67,6 +75,7 @@ public class TaskController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", taskPage.getTotalPages());
         model.addAttribute("size", pageSize);
+        model.addAttribute("view", view);
         model.addAttribute("view", view);
 
         return "tasks";

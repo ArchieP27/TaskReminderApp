@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
@@ -94,5 +95,20 @@ public class TaskRestController {
             return ResponseEntity.notFound().build();
         taskService.markTask(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/due-today")
+    public ResponseEntity<List<Task>> getTasksDueToday(){
+        return ResponseEntity.ok(taskService.getTasksDueToday());
+    }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<Task>> getUpcomingTasks(@RequestParam(defaultValue = "3") int days){
+        return ResponseEntity.ok(taskService.getUpcomingTasks(days));
+    }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<List<Task>> getOverdueTasks(){
+        return ResponseEntity.ok(taskService.getOverdueTasks());
     }
 }
