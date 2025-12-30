@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | TaskFlow</title>
+    <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+  </head>
+  <body>
+    <div id="popup" th:if="${error}" class="popup-error">
+      <span th:text="${error}"></span>
+    </div>
+    <div id="popup" th:if="${success}" class="popup-success">
+      <span th:text="${success}"></span>
+    </div>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <header class="hero-header">
+      <div class="header-content">
+        <div class="logo">
+          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+          <h1>Task Reminder Application</h1>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div class="blob shape-1"></div>
+      <div class="blob shape-2"></div>
+      <div class="blob shape-3"></div>
+
+      <div class="auth-card">
+        <div class="auth-sidebar">
+          <div class="sidebar-badge">Plan. Focus. Achieve.</div>
+          <h2>Organize Your Day</h2>
+          <p>
+            Sign up to streamline your tasks, stay on top of deadlines, and keep
+            your day on track effortlessly.
+          </p>
+
+          <ul class="benefit-list">
+            <li>
+              <span class="dot dot-red"></span> High Priority Task Tracking
+            </li>
+            <li>
+              <span class="dot dot-orange"></span> Custom Reminder Schedules
+            </li>
+            <li><span class="dot dot-green"></span> Real-time Progress Sync</li>
+          </ul>
+        </div>
+
+        <div class="auth-form">
+          <div class="form-title">Create Account</div>
+          <div class="form-subtitle">
+            Get started in seconds and boost your productivity
+          </div>
+
+          <form th:action="@{/register}" method="post">
+            <div class="input-group">
+              <label>Full Name</label>
+              <input type="text" name="name" placeholder="Name" required />
+            </div>
+
+            <div class="input-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="name@company.com"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <input type="submit" value="Create Account" class="submit-btn" />
+          </form>
+
+          <div class="switch-auth">
+            Already have an account? <a href="/login">Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="fixed-footer">
+      <div class="clock-icon-container">
+        <img src="/images/clock.png" class="clock-icon" alt="Time" />
+      </div>
+      <div class="footer-text">
+        Task Reminder App &copy; 2025 - Created By Archie
+      </div>
+    </footer>
+  </body>
+</html>

@@ -60,7 +60,16 @@ public class TaskController {
 
         if ("calendar".equals(view)) {
             List<Task> tasks = taskService.getAllTasks();
+
             model.addAttribute("tasks", tasks);
+            model.addAttribute("overdueTasks", taskService.getOverdueTasks());
+            model.addAttribute("todayTasks", taskService.getTasksDueToday());
+            model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(7));
+            model.addAttribute("completedTasks",
+                    tasks.stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
+            model.addAttribute("pendingTasks",
+                    tasks.stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
+            model.addAttribute("allTasks", tasks);
 
             model.addAttribute("view", view);
             model.addAttribute("size", pageSize);
@@ -77,6 +86,18 @@ public class TaskController {
         model.addAttribute("size", pageSize);
         model.addAttribute("view", view);
         model.addAttribute("view", view);
+        model.addAttribute("status", status);
+        model.addAttribute("priority", priority);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("overdueTasks", taskService.getOverdueTasks());
+        model.addAttribute("todayTasks", taskService.getTasksDueToday());
+        model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(7));
+        model.addAttribute("completedTasks", taskService.getAllTasks()
+                .stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
+        model.addAttribute("pendingTasks", taskService.getAllTasks()
+                .stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
+        model.addAttribute("allTasks", taskService.getAllTasks());
+
 
         return "tasks";
     }

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify OTP | TaskFlow</title>
+    <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+  </head>
+  <body>
+    <div id="popup" th:if="${error}" class="popup-error">
+      <span th:text="${error}"></span>
+    </div>
+    <div id="popup" th:if="${success}" class="popup-success">
+      <span th:text="${success}"></span>
+    </div>
+
+    <div class="blob shape-1"></div>
+    <div class="blob shape-2"></div>
+    <div class="blob shape-3"></div>
+
+    <header class="hero-header">
+      <div class="header-content">
+        <div class="logo">
+          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+          <h1>Task Reminder Application</h1>
+        </div>
+      </div>
+    </header>
+
+    <a class="login" th:href="@{/login}">Back to Login Page</a>
+
+    <div class="content-body">
+      <div class="auth-card">
+        <div class="auth-sidebar">
+          <div class="sidebar-badge">Security Check</div>
+          <h2>Almost There</h2>
+          <p>
+            We've sent a 6-digit code to your inbox. Please enter it to verify
+            your account and get started.
+          </p>
+
+          <ul class="benefit-list">
+            <li><span class="dot dot-green"></span> Identity verification</li>
+            <li><span class="dot dot-orange"></span> Secure access setup</li>
+            <li><span class="dot dot-red"></span> Protecting your data</li>
+          </ul>
+        </div>
+
+        <div class="auth-form">
+          <div class="form-title">Verify Email</div>
+          <div class="form-subtitle">
+            Check your email for the verification code
+          </div>
+
+          <form th:action="@{/verify-otp}" method="post">
+            <div class="input-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="name@company.com"
+                th:value="${email != null} ? ${email} : ''"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label>OTP Code</label>
+              <input
+                type="text"
+                name="otp"
+                placeholder="Enter 6-digit code"
+                required
+                style="
+                  letter-spacing: 4px;
+                  font-size: 1.2rem;
+                  text-align: center;
+                "
+              />
+            </div>
+
+            <input type="submit" value="Verify Account" class="submit-btn" />
+          </form>
+
+          <div class="switch-auth">
+            Didn’t receive the code?
+            <form
+              th:action="@{/resend-otp}"
+              method="post"
+              style="display: inline"
+            >
+              <input type="hidden" name="email" id="resend-email" />
+              <button type="submit" class="link-button">Resend OTP</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const emailInput = document.querySelector('input[name="email"]');
+      const resendInput = document.getElementById("resend-email");
+      emailInput.addEventListener("input", () => {
+        resendInput.value = emailInput.value;
+      });
+    </script>
+
+    <footer class="fixed-footer">
+      <div class="clock-icon-container">
+        <img src="/images/clock.png" class="clock-icon" alt="Time" />
+      </div>
+      <div class="footer-text">
+        Task Reminder App &copy; 2025 - Created By Archie
+      </div>
+    </footer>
+  </body>
+</html>

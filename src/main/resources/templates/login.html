@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | TaskFlow</title>
+    <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+  </head>
+  <body>
+    <div id="popup" th:if="${error}" class="popup-error">
+      <span th:text="${error}"></span>
+    </div>
+    <div id="popup" th:if="${success}" class="popup-success">
+      <span th:text="${success}"></span>
+    </div>
+    <div class="blob shape-1"></div>
+    <div class="blob shape-2"></div>
+    <div class="blob shape-3"></div>
+
+    <header class="hero-header">
+      <div class="header-content">
+        <div class="logo">
+          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+          <h1>Task Reminder Application</h1>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div class="auth-card">
+        <div class="auth-sidebar">
+          <div class="sidebar-badge">Welcome Back</div>
+          <h2>Focus on Flow</h2>
+          <p>
+            Sign in to pick up exactly where you left off and manage your
+            priorities effortlessly.
+          </p>
+
+          <ul class="benefit-list">
+            <li><span class="dot dot-green"></span> Dashboard sync active</li>
+            <li><span class="dot dot-orange"></span> Notifications ready</li>
+            <li><span class="dot dot-red"></span> High security enabled</li>
+          </ul>
+        </div>
+
+        <div class="auth-form">
+          <div class="form-title">Login</div>
+          <div class="form-subtitle">
+            Enter your credentials to access your tasks
+          </div>
+
+          <div
+            th:if="${param.error}"
+            style="color: var(--danger); font-weight: 700; margin-bottom: 15px"
+          >
+            ✕ Invalid email or password
+          </div>
+          <div
+            th:if="${param.logout}"
+            style="color: var(--success); font-weight: 700; margin-bottom: 15px"
+          >
+            ✓ Logged out successfully
+          </div>
+
+          <form th:action="@{/login}" method="post">
+            <div class="input-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="name@company.com"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <input type="submit" value="Sign In" class="submit-btn" />
+          </form>
+
+          <div class="switch-auth">
+            Don’t have an account? <a href="/register">Create one</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="fixed-footer">
+      <div class="clock-icon-container">
+        <img src="/images/clock.png" class="clock-icon" alt="Time" />
+      </div>
+      <div class="footer-text">
+        Task Reminder App &copy; 2025 - Created By Archie
+      </div>
+    </footer>
+  </body>
+</html>

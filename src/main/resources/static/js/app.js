@@ -22,30 +22,54 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const events = tasksData
       .map((task) => {
-        const dueDate = task.dueDate;
-        if (!dueDate) return null;
+        if (!task.dueDate) return null;
 
-        let dateString =
-          typeof dueDate === "string"
-            ? dueDate.split("T")[0]
-            : `${dueDate.year}-${String(dueDate.monthValue).padStart(
+        const dateString =
+          typeof task.dueDate === "string"
+            ? task.dueDate.split("T")[0]
+            : `${task.dueDate.year}-${String(task.dueDate.monthValue).padStart(
                 2,
                 "0"
-              )}-${String(dueDate.dayOfMonth).padStart(2, "0")}`;
+              )}-${String(task.dueDate.dayOfMonth).padStart(2, "0")}`;
 
-        const pLabel = task.priority?.label || task.priority || "Low";
-        const priorityClass = pLabel.toLowerCase().trim();
+        const due = new Date(dateString);
+        const status = task.status;
+        const priority = (
+          task.priority?.label ||
+          task.priority ||
+          "LOW"
+        ).toLowerCase();
+
+        const classes = [`cal-priority-${priority}`];
+
+        let tooltip = task.title;
+
+        if (status === "COMPLETED") {
+          classes.push("cal-completed");
+          tooltip = "✅ Completed task";
+        }
+
+        if (status !== "COMPLETED" && due < today) {
+          classes.push("cal-overdue");
+          const diffDays = Math.ceil((today - due) / (1000 * 60 * 60 * 24));
+          tooltip = `⚠️ Overdue by ${diffDays} day${diffDays > 1 ? "s" : ""}`;
+        }
 
         return {
           title: task.title,
           start: dateString,
-          className: `cal-event-pill cal-priority-${priorityClass}`,
+          className: classes.join(" "),
           extendedProps: { taskId: task.id },
+          titleAttr: tooltip,
         };
       })
       .filter(Boolean);
+
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: "dayGridMonth",
