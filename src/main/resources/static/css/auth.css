@@ -242,6 +242,13 @@ form {
   display: block;
 }
 
+.password-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 12px;
+}
+
 input {
   width: 100%;
   padding: 17px 20px;
@@ -261,6 +268,55 @@ input:focus {
   background: white;
   box-shadow: 0 10px 25px rgba(90, 119, 245, 0.1);
   transform: translateY(-2px);
+}
+
+.tooltip-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tooltip-text {
+  position: absolute;
+  bottom: -16px;
+  left: 29px;
+  background: var(--danger);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tooltip-text::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 12px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent var(--danger) transparent;
+}
+
+.tooltip-wrapper.invalid .tooltip-text {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-wrapper.invalid input {
+  border-color: var(--danger);
+}
+
+.submit-btn:disabled,
+.submit-btn:disabled:hover {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .submit-btn {
@@ -386,7 +442,7 @@ input:focus {
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 10000;
   animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
 }
 
@@ -400,7 +456,7 @@ input:focus {
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 10000;
   animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
 }
 
@@ -415,7 +471,7 @@ input:focus {
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: -1000;
+  z-index: 9999;
   text-decoration: none;
   transition: background 0.3s ease;
 }
@@ -442,4 +498,35 @@ input:focus {
     opacity: 0;
     transform: translateX(100%);
   }
+}
+
+.otp-timer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  gap: 8px;
+}
+
+.otp-icon {
+  width: 24px;
+  height: 24px;
+}
+
+#otp-countdown {
+  background: #2ecc71;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
+  transition: all 0.3s ease, background 0.3s ease;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

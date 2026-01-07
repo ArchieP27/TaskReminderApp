@@ -1,64 +1,103 @@
 package com.taskreminder.app.Controller;
 
 import com.taskreminder.app.Entity.User;
+import com.taskreminder.app.Repository.UserRepository;
 import com.taskreminder.app.Service.UserService;
+import com.taskreminder.app.dto.LoginRequest;
+import com.taskreminder.app.dto.OtpRequest;
+import com.taskreminder.app.dto.RegisterRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.ZoneId;
+import java.util.Map;
+import java.util.Optional;
+
 @Controller
+@RequestMapping("/auth")
 public class AuthController {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
 
     @GetMapping("/register")
-    public String showRegisterForm(Model model){
-        model.addAttribute("user", new User());
+    public String showRegister(Model model) {
+        model.addAttribute("registerRequest", new RegisterRequest());
         return "register";
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute User user, RedirectAttributes redirectAttributes){
-        try{
-            userService.register(user);
-            redirectAttributes.addFlashAttribute("success","Account Created Successfully!");
-            redirectAttributes.addFlashAttribute("email", user.getEmail());
-            return "redirect:/verify-otp";
-        }catch (Exception e){
-            redirectAttributes.addFlashAttribute("error",e.getMessage());
-            return "redirect:/register";
+    public String register(
+            @ModelAttribute RegisterRequest request,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", "Passwords do not match"
+            );
+            return "redirect:/auth/register";
         }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+
+        String response = userService.register(user);
+
+        if (response.startsWith("Registration successful")) {
+            redirectAttributes.addFlashAttribute("successMessage", response);
+            return "redirect:/auth/verify-otp?email=" + user.getEmail();
+        }
+
+        redirectAttributes.addFlashAttribute("errorMessage", response);
+        return "redirect:/auth/register";
     }
 
     @GetMapping("/verify-otp")
-    public String showOtpPage(@RequestParam(value = "email", required = false) String email, Model model) {
-        if (email != null) {
-            model.addAttribute("email", email);
+    public String showOtpPage(
+            @RequestParam(required = false) String email,
+            Model model
+    ) {
+        model.addAttribute("email", email);
+        OtpRequest otpRequest = new OtpRequest();
+        if(email != null) {
+            Optional<User> userOpt = userService.findByEmail(email);
+            otpRequest.setEmail(email);
+            if(userOpt.isPresent() && userOpt.get().getOtpExpiry() != null) {
+                long expiryMillis = userOpt.get().getOtpExpiry()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli();
+                model.addAttribute("otpExpiryMillis", expiryMillis);
+            }
         }
+        model.addAttribute("otpRequest",otpRequest);
         return "verify-otp";
     }
 
     @PostMapping("/verify-otp")
-    public String verifyOtp(
-            @RequestParam String email,
-            @RequestParam String otp,
+    public String verifyOtpMvc(
+            @ModelAttribute("otpRequest") OtpRequest otpRequest,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            userService.verifyOtp(email, otp);
-            redirectAttributes.addFlashAttribute(
-                    "success", "Account verified successfully");
-            return "redirect:/login";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/verify-otp";
+        String response = userService.verifyOtp(otpRequest.getEmail(),otpRequest.getOtp());
+
+        if (response.contains("successfully")) {
+            redirectAttributes.addFlashAttribute("successMessage", response);
+            return "redirect:/auth/login";
         }
+
+        redirectAttributes.addFlashAttribute("errorMessage", response);
+        return "redirect:/auth/verify-otp?email=" + otpRequest.getEmail();
     }
 
     @GetMapping("/login")
@@ -67,19 +106,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(
+    public String loginMvc(
             @RequestParam String email,
             @RequestParam String password,
+            HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            userService.login(email, password);
-            redirectAttributes.addFlashAttribute("success","User Login success!");
+        String response = userService.loginUser(email, password, session);
+
+        if (response.equalsIgnoreCase("Login successful")) {
             return "redirect:/api/tasks";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/login";
         }
+
+        redirectAttributes.addFlashAttribute("errorMessage", response);
+        return "redirect:/auth/login";
     }
 
     @PostMapping("/resend-otp")
@@ -87,14 +127,72 @@ public class AuthController {
             @RequestParam String email,
             RedirectAttributes redirectAttributes
     ) {
-        try {
-            userService.resendOtp(email);
-            redirectAttributes.addFlashAttribute("success", "OTP has been resent to your email!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        String response = userService.resendOtp(email);
+
+        if (response.contains("successfully")) {
+            redirectAttributes.addFlashAttribute("successMessage", response);
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", response);
         }
-        return "redirect:/verify-otp?email=" + email;
+
+        return "redirect:/auth/verify-otp?email=" + email;
+    }
+
+    @GetMapping("/logout")
+    public String logoutMvc(HttpSession session, RedirectAttributes redirectAttributes) {
+        session.invalidate();
+        redirectAttributes.addFlashAttribute("successMessage", "Logged out successfully.");
+        return "redirect:/auth/login";
     }
 
 
+    @PostMapping("/api/verify")
+    @ResponseBody
+    public ResponseEntity<?> verifyApi(@RequestBody OtpRequest request) {
+        String response = userService.verifyOtp(
+                request.getEmail(),
+                request.getOtp()
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/login")
+    @ResponseBody
+    public ResponseEntity<?> loginApi(
+            @RequestBody LoginRequest request,
+            HttpSession session
+    ) {
+        String response = userService.loginUser(
+                request.getEmail(),
+                request.getPassword(),
+                session
+        );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/me")
+    @ResponseBody
+    public ResponseEntity<?> me(HttpSession session) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.ok(Map.of("loggedIn", false));
+        }
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "loggedIn", true,
+                        "id", userId,
+                        "email", session.getAttribute("email")
+                )
+        );
+    }
+
+    @PostMapping("/api/logout")
+    @ResponseBody
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

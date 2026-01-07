@@ -11,17 +11,32 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     private boolean verified = false;
-    private String otp;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String otp;
+    private LocalDateTime otpExpiry;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void clearOtp() {
+        this.otp = null;
+        this.otpExpiry = null;
+    }
 
     public User(){}
 
@@ -89,5 +104,13 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getOtpExpiry(){
+        return otpExpiry;
+    }
+
+    public void setOtpExpiry(LocalDateTime otpExpiry){
+        this.otpExpiry = otpExpiry;
     }
 }

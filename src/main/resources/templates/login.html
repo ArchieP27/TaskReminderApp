@@ -7,13 +7,16 @@
     <link rel="stylesheet" href="/css/auth.css" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
+
   <body>
-    <div id="popup" th:if="${error}" class="popup-error">
-      <span th:text="${error}"></span>
+    <div th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
     </div>
-    <div id="popup" th:if="${success}" class="popup-success">
-      <span th:text="${success}"></span>
+
+    <div th:if="${successMessage}" class="popup-success">
+      <span th:text="${successMessage}"></span>
     </div>
+
     <div class="blob shape-1"></div>
     <div class="blob shape-2"></div>
     <div class="blob shape-3"></div>
@@ -36,7 +39,6 @@
             Sign in to pick up exactly where you left off and manage your
             priorities effortlessly.
           </p>
-
           <ul class="benefit-list">
             <li><span class="dot dot-green"></span> Dashboard sync active</li>
             <li><span class="dot dot-orange"></span> Notifications ready</li>
@@ -49,21 +51,8 @@
           <div class="form-subtitle">
             Enter your credentials to access your tasks
           </div>
-
-          <div
-            th:if="${param.error}"
-            style="color: var(--danger); font-weight: 700; margin-bottom: 15px"
-          >
-            ✕ Invalid email or password
-          </div>
-          <div
-            th:if="${param.logout}"
-            style="color: var(--success); font-weight: 700; margin-bottom: 15px"
-          >
-            ✓ Logged out successfully
-          </div>
-
-          <form th:action="@{/login}" method="post">
+          
+          <form th:action="@{/auth/login}" method="post">
             <div class="input-group">
               <label>Email Address</label>
               <input
@@ -88,7 +77,8 @@
           </form>
 
           <div class="switch-auth">
-            Don’t have an account? <a href="/register">Create one</a>
+            Don’t have an account?
+            <a th:href="@{/auth/register}">Create one</a>
           </div>
         </div>
       </div>

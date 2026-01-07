@@ -4,6 +4,7 @@ import com.taskreminder.app.Entity.Task;
 import com.taskreminder.app.Service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -34,8 +34,12 @@ public class TaskController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "table") String view,
-            Model model
+            Model model, HttpSession session
     ) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
+
         Sort sortObj = Sort.unsorted();
         if (sort != null && !sort.isBlank()) {
             switch (sort) {
@@ -85,7 +89,6 @@ public class TaskController {
         model.addAttribute("totalPages", taskPage.getTotalPages());
         model.addAttribute("size", pageSize);
         model.addAttribute("view", view);
-        model.addAttribute("view", view);
         model.addAttribute("status", status);
         model.addAttribute("priority", priority);
         model.addAttribute("keyword", keyword);
@@ -103,13 +106,19 @@ public class TaskController {
     }
 
     @GetMapping("/add")
-    public String showAddForm(Model model) {
+    public String showAddForm(Model model, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         model.addAttribute("task", new Task());
         return "add-task";
     }
 
     @PostMapping("/add")
-    public String saveTask(@ModelAttribute Task task, Model model, RedirectAttributes ra) {
+    public String saveTask(@ModelAttribute Task task, Model model, RedirectAttributes ra, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Title is Required!");
             model.addAttribute("task", task);
@@ -131,7 +140,10 @@ public class TaskController {
     }
 
     @GetMapping("/update/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model, RedirectAttributes ra) {
+    public String showEditForm(@PathVariable Integer id, Model model, RedirectAttributes ra, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         Task task = taskService.findById(id).orElse(null);
         if (task == null) {
             return "redirect:/api/tasks";
@@ -146,7 +158,10 @@ public class TaskController {
 
 
     @PostMapping("/update/{id}")
-    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra) {
+    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Title is Required!");
             model.addAttribute("task", task);
@@ -174,7 +189,10 @@ public class TaskController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTask(@PathVariable Integer id, Model model, RedirectAttributes ra) {
+    public String deleteTask(@PathVariable Integer id, Model model, RedirectAttributes ra, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         if (taskService.findById(id).isEmpty()) {
             model.addAttribute("errorMessage", "Task not found!");
             return "redirect:/api/tasks";
@@ -189,7 +207,10 @@ public class TaskController {
 
 
     @GetMapping("/markAsDone/{id}")
-    public String markAsDone(@PathVariable Integer id, RedirectAttributes ra) {
+    public String markAsDone(@PathVariable Integer id, RedirectAttributes ra, HttpSession session) {
+        if(session.getAttribute("userId")==null){
+            return "redirect:/auth/login";
+        }
         try {
             taskService.markTask(id);
             ra.addFlashAttribute(

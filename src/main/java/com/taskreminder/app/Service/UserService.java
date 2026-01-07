@@ -2,10 +2,12 @@ package com.taskreminder.app.Service;
 
 import com.taskreminder.app.Entity.User;
 import com.taskreminder.app.Repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -14,75 +16,139 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
-//    private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
 
-    public User register(User user){
-        if(userRepository.findByEmail(user.getEmail()).isPresent())
-            throw new RuntimeException("An account with the given email already exists!");
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public String register(User user) {
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            return "An account with this email already exists";
+        }
+
         String otp = generateOtp();
         user.setOtp(otp);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
         user.setVerified(false);
-        System.out.println("OTP for " + user.getEmail() + " = " + otp);
-        return userRepository.save(user);
+
+        userRepository.save(user);
+        sendOtpEmail(user, otp);
+
+        return "Registration successful. Please verify OTP.";
     }
 
-    private String generateOtp() {
-        int otp = (int) (Math.random() * 900000) + 100000;
-        return String.valueOf(otp);
+    public String loginUser(String email, String password, HttpSession session) {
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            return "User not found!";
+        }
+
+        User user = optionalUser.get();
+
+        if (!user.isVerified()) {
+            return "User is not verified. Please verify OTP first.";
+        }
+
+        if (!user.getPassword().equals(password)) {
+            return "Invalid password";
+        }
+
+        session.setAttribute("loggedInUser", user.getId());
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("email", user.getEmail());
+
+        return "Login successful";
     }
 
-    public void verifyOtp(String email, String otp) {
+    public String verifyOtp(String email, String otp) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            return "User not found";
+        }
+
+        User user = optionalUser.get();
+
+        if (user.isVerified()) {
+            return "User already verified";
+        }
+
+        if (user.getOtp() == null) {
+            return "OTP not generated";
+        }
+
+        if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            return "OTP expired";
+        }
 
         if (!user.getOtp().equals(otp)) {
-            throw new RuntimeException("Invalid OTP");
+            return "Invalid OTP";
         }
 
         user.setVerified(true);
-        user.setOtp(null);
+        user.clearOtp();
 
         userRepository.save(user);
+
+        return "OTP verified successfully";
     }
 
-    public void login(String email, String rawPassword) {
+    public String resendOtp(String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-//        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-//            throw new RuntimeException("Invalid email or password");
-//        }
-        if (!user.getPassword().equals(rawPassword)) {
-            throw new RuntimeException("Invalid email or password");
+        if (optionalUser.isEmpty()) {
+            return "User not found";
         }
 
-        if (!user.isVerified()) {
-            throw new RuntimeException("Please verify your account first");
-        }
-    }
+        User user = optionalUser.get();
 
-    public void resendOtp(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if(user.isVerified()) {
-            throw new RuntimeException("Account is already verified");
+        if (user.isVerified()) {
+            return "User already verified";
         }
 
         String otp = generateOtp();
         user.setOtp(otp);
-        userRepository.save(user);
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
 
-        System.out.println("Resent OTP for " + email + " = " + otp);
+        userRepository.save(user);
+        sendOtpEmail(user, otp);
+
+        return "OTP resent successfully";
     }
 
-    public User findByEmailOrThrow(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    private String generateOtp() {
+        return String.valueOf((int) (Math.random() * 900000) + 100000);
+    }
+
+    private void sendOtpEmail(User user, String otp) {
+
+        String body =
+                "<!DOCTYPE html>" +
+                        "<html>" +
+                        "<body style='font-family: Arial; background-color:#f4f4f4; padding:20px;'>" +
+                        "  <div style='background:#ffffff; padding:20px; border-radius:8px;'>" +
+                        "    <h2>Welcome to Task Reminder Application 🎉</h2>" +
+                        "    <p>Hey <strong>" + user.getName() + "</strong>,</p>" +
+                        "    <p>Please use the OTP below to continue logging in:</p>" +
+                        "    <h1 style='color:#2d89ef; letter-spacing:4px;'>" + otp + "</h1>" +
+                        "    <p>This OTP is valid for a limited time.</p>" +
+                        "    <p style='font-size:12px; color:#777;'>Do not share this OTP with anyone.</p>" +
+                        "  </div>" +
+                        "</body>" +
+                        "</html>";
+
+        emailService.sendEmail(
+                user.getEmail(),
+                "OTP Verification",
+                body
+        );
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }

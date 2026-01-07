@@ -37,11 +37,10 @@ public class EmailService {
                     Message.RecipientType.TO, InternetAddress.parse(to)
             );
             message.setSubject(subject);
-            message.setText(body);
+            message.setContent(body, "text/html; charset=utf-8");
 
             Transport.send(message);
 
-            System.out.println("Email Sent Successfully!");
         }catch (MessagingException e) {
             throw new RuntimeException("Failed to send email.", e);
         }

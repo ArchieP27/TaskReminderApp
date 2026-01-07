@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="/css/auth.css" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
+
   <body>
-    <div id="popup" th:if="${error}" class="popup-error">
-      <span th:text="${error}"></span>
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
     </div>
-    <div id="popup" th:if="${success}" class="popup-success">
-      <span th:text="${success}"></span>
+
+    <div id="popup" th:if="${successMessage}" class="popup-success">
+      <span th:text="${successMessage}"></span>
     </div>
 
     <div class="orb orb-1"></div>
@@ -59,37 +61,60 @@
             Get started in seconds and boost your productivity
           </div>
 
-          <form th:action="@{/register}" method="post">
+          <form
+            th:action="@{/auth/register}"
+            th:object="${registerRequest}"
+            method="post"
+          >
             <div class="input-group">
               <label>Full Name</label>
-              <input type="text" name="name" placeholder="Name" required />
+              <input
+                type="text"
+                th:field="*{name}"
+                placeholder="Name"
+                required
+              />
             </div>
 
             <div class="input-group">
               <label>Email Address</label>
               <input
                 type="email"
-                name="email"
+                th:field="*{email}"
                 placeholder="name@company.com"
                 required
               />
             </div>
 
-            <div class="input-group">
+            <div class="input-group password-group">
               <label>Password</label>
+              <label>Confirm Password</label>
+
               <input
                 type="password"
-                name="password"
+                th:field="*{password}"
                 placeholder="••••••••"
+                minlength="8"
                 required
               />
+
+              <div class="tooltip-wrapper">
+                <input
+                  type="password"
+                  th:field="*{confirmPassword}"
+                  placeholder="••••••••"
+                  minlength="8"
+                  required
+                />
+                <span class="tooltip-text">Passwords do not match</span>
+              </div>
             </div>
 
             <input type="submit" value="Create Account" class="submit-btn" />
           </form>
 
           <div class="switch-auth">
-            Already have an account? <a href="/login">Login</a>
+            Already have an account? <a href="/auth/login">Login</a>
           </div>
         </div>
       </div>
@@ -103,5 +128,36 @@
         Task Reminder App &copy; 2025 - Created By Archie
       </div>
     </footer>
+
+    <script>
+      const passwordInput = document.querySelector('input[name="password"]');
+      const confirmPasswordInput = document.querySelector(
+        'input[name="confirmPassword"]'
+      );
+      const tooltipWrapper = confirmPasswordInput.parentElement;
+      const submitBtn = document.querySelector(".submit-btn");
+
+      function validatePasswordsLive() {
+        if (!confirmPasswordInput.value) {
+          tooltipWrapper.classList.remove("invalid");
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = "1";
+          return;
+        }
+
+        if (passwordInput.value !== confirmPasswordInput.value) {
+          tooltipWrapper.classList.add("invalid");
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = "0.6";
+        } else {
+          tooltipWrapper.classList.remove("invalid");
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = "1";
+        }
+      }
+
+      passwordInput.addEventListener("input", validatePasswordsLive);
+      confirmPasswordInput.addEventListener("input", validatePasswordsLive);
+    </script>
   </body>
 </html>
