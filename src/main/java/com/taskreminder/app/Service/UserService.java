@@ -57,6 +57,7 @@ public class UserService {
         session.setAttribute("loggedInUser", user.getId());
         session.setAttribute("userId", user.getId());
         session.setAttribute("email", user.getEmail());
+        session.setAttribute("name", user.getName());
 
         return "Login successful";
     }

@@ -1,4 +1,4 @@
-# 🗂️ Task Reminder Application
+# 🗂️ TimeIt - A Task Reminder Application
 
 
 ## 📌 Description
@@ -11,6 +11,7 @@ The application allows users to **add, edit, delete, and view tasks** using mult
 
 ## 📸 Screenshot
 
+![Task Manager Screenshot](screenshots/landing.png)
 ![Task Manager Screenshot](screenshots/app.png)
 
 ---
@@ -70,6 +71,8 @@ app/
 │   └── com.taskreminder.app
 │       ├── controller
 │       ├── service
+│       ├── dto
+│       ├── enums
 │       ├── repository
 │       └── entity
 │
@@ -78,6 +81,13 @@ app/
 │   │   ├── css
 │   │   └── js
 │   └── templates
+        └── fragments
+            ├── header.html
+            └── footer.html
+│       ├── index.html
+│       ├── register.html
+│       ├── login.html
+│       ├── verify-otp.html
 │       ├── tasks.html
 │       ├── add-task.html
 │       └── update-task.html

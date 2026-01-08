@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verify OTP | TaskFlow</title>
+    <title>Verify OTP | TimeIt</title>
     <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
 
@@ -21,14 +22,17 @@
     <div class="blob shape-2"></div>
     <div class="blob shape-3"></div>
 
-    <header class="hero-header">
-      <div class="header-content">
-        <div class="logo">
-          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
-          <h1>Task Reminder Application</h1>
+    <div class="logo brand-box">
+      <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+      <div class="brand-text">
+        <h1 class="brand-name">TimeIt</h1>
+        <div class="divider"></div>
+        <div class="slogan-stack">
+          <span class="slogan-top">"Seize the day</span>
+          <span class="slogan-bottom">one task at a time"</span>
         </div>
       </div>
-    </header>
+    </div>
 
     <a class="login" th:href="@{/auth/login}">Back to Login Page</a>
 
@@ -59,7 +63,11 @@
             <span id="otp-countdown">05:00</span>
           </div>
 
-          <form th:action="@{/auth/verify-otp}" th:object="${otpRequest}" method="post">
+          <form
+            th:action="@{/auth/verify-otp}"
+            th:object="${otpRequest}"
+            method="post"
+          >
             <div class="input-group">
               <label>Email Address</label>
               <input type="email" th:field="*{email}" required />
@@ -86,7 +94,11 @@
               method="post"
               style="display: inline"
             >
-              <input type="hidden" name="email" th:value="${otpRequest.email}" />
+              <input
+                type="hidden"
+                name="email"
+                th:value="${otpRequest.email}"
+              />
               <button type="submit" class="link-button">Resend OTP</button>
             </form>
           </div>
@@ -94,14 +106,8 @@
       </div>
     </div>
 
-    <footer class="fixed-footer">
-      <div class="clock-icon-container">
-        <img src="/images/clock.png" class="clock-icon" alt="Time" />
-      </div>
-      <div class="footer-text">
-        Task Reminder App &copy; 2025 - Created By Archie
-      </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
     <script th:inline="javascript">
       /*<![CDATA[*/
       const otpExpiryMillis = /*[[${otpExpiryMillis}]]*/ 0;

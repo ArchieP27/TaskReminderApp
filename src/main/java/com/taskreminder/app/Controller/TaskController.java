@@ -1,6 +1,7 @@
 package com.taskreminder.app.Controller;
 
 import com.taskreminder.app.Entity.Task;
+import com.taskreminder.app.Entity.User;
 import com.taskreminder.app.Service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
@@ -14,9 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/api/tasks")
@@ -34,11 +35,15 @@ public class TaskController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "table") String view,
-            Model model, HttpSession session
+            Model model,
+            HttpSession session
     ) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) return "redirect:/auth/login";
+
+        if (page < 0) page = 0;
+        if (size != null && size <= 0) size = 5;
 
         Sort sortObj = Sort.unsorted();
         if (sort != null && !sort.isBlank()) {
@@ -62,27 +67,53 @@ public class TaskController {
             pageSize = size;
         }
 
-        if ("calendar".equals(view)) {
-            List<Task> tasks = taskService.getAllTasks();
+        List<Task> allTasks = taskService.getAllTasksByUser(userId);
 
-            model.addAttribute("tasks", tasks);
-            model.addAttribute("overdueTasks", taskService.getOverdueTasks());
-            model.addAttribute("todayTasks", taskService.getTasksDueToday());
-            model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(7));
+        if ("calendar".equals(view)) {
+
+            if (allTasks.isEmpty()) {
+                model.addAttribute("errorMessage", "No tasks available to display on the calendar.");
+                model.addAttribute("successMessage", null);
+            }
+
+            model.addAttribute("tasks", allTasks);
+            model.addAttribute("overdueTasks", taskService.getOverdueTasks(userId));
+            model.addAttribute("todayTasks", taskService.getTasksDueToday(userId));
+            model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(userId, 7));
             model.addAttribute("completedTasks",
-                    tasks.stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
+                    allTasks.stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
             model.addAttribute("pendingTasks",
-                    tasks.stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
-            model.addAttribute("allTasks", tasks);
+                    allTasks.stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
+            model.addAttribute("allTasks", allTasks);
 
             model.addAttribute("view", view);
             model.addAttribute("size", pageSize);
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "dashboard");
+
             return "tasks";
         }
 
         Pageable pageable = PageRequest.of(page, pageSize, sortObj);
-        Page<Task> taskPage =
-                taskService.getPagedTasks(pageable, status, priority, keyword);
+
+        Page<Task> taskPage;
+        try {
+            taskPage = taskService.getPagedTasks(userId, pageable, status, priority, keyword);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", "Invalid filter value provided.");
+            model.addAttribute("tasks", List.of());
+            model.addAttribute("successMessage", null);
+            model.addAttribute("currentPage", 0);
+            model.addAttribute("totalPages", 0);
+            model.addAttribute("size", pageSize);
+            model.addAttribute("view", view);
+            model.addAttribute("status", null);
+            model.addAttribute("priority", null);
+            model.addAttribute("keyword", keyword);
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "dashboard");
+            return "tasks";
+        }
 
         model.addAttribute("tasks", taskPage.getContent());
         model.addAttribute("currentPage", page);
@@ -92,135 +123,287 @@ public class TaskController {
         model.addAttribute("status", status);
         model.addAttribute("priority", priority);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("overdueTasks", taskService.getOverdueTasks());
-        model.addAttribute("todayTasks", taskService.getTasksDueToday());
-        model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(7));
-        model.addAttribute("completedTasks", taskService.getAllTasks()
-                .stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
-        model.addAttribute("pendingTasks", taskService.getAllTasks()
-                .stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
-        model.addAttribute("allTasks", taskService.getAllTasks());
+        model.addAttribute("overdueTasks", taskService.getOverdueTasks(userId));
+        model.addAttribute("todayTasks", taskService.getTasksDueToday(userId));
+        model.addAttribute("upcomingTasks", taskService.getUpcomingTasks(userId, 7));
+        model.addAttribute("completedTasks",
+                allTasks.stream().filter(t -> t.getStatus() == TaskStatus.COMPLETED).toList());
+        model.addAttribute("pendingTasks",
+                allTasks.stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
+        model.addAttribute("allTasks", allTasks);
+        model.addAttribute("userName", session.getAttribute("name"));
+        model.addAttribute("activePage", "dashboard");
 
+        boolean noTasksAtAll = allTasks.isEmpty();
+        boolean noResultsAfterFilter = taskPage.isEmpty() && !noTasksAtAll;
+        boolean pageOutOfRange = page >= taskPage.getTotalPages() && taskPage.getTotalPages() > 0;
+
+        if (noTasksAtAll) {
+            model.addAttribute("errorMessage", "You don’t have any tasks yet.");
+            model.addAttribute("successMessage", null);
+        } else if (pageOutOfRange) {
+            model.addAttribute("errorMessage", "The page you requested does not exist.");
+            model.addAttribute("successMessage", null);
+        } else if (noResultsAfterFilter) {
+            model.addAttribute("errorMessage", "No tasks match your current filters.");
+            model.addAttribute("successMessage", null);
+        }
 
         return "tasks";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
+        try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return "redirect:/auth/login";
+            }
+
+            if (!model.containsAttribute("task")) {
+                model.addAttribute("task", new Task());
+            }
+
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "add");
+            model.addAttribute("errorMessage", null);
+
+            return "add-task";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Unable to load the Add Task form. Please try again.");
+            model.addAttribute("successMessage", null);
+            model.addAttribute("task", new Task());
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "add");
+            return "add-task";
         }
-        model.addAttribute("task", new Task());
-        return "add-task";
     }
+
 
     @PostMapping("/add")
-    public String saveTask(@ModelAttribute Task task, Model model, RedirectAttributes ra, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
-        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
-            model.addAttribute("errorMessage", "Title is Required!");
-            model.addAttribute("task", task);
+    public String saveTask(
+            @ModelAttribute Task task,
+            Model model,
+            RedirectAttributes ra,
+            HttpSession session
+    ) {
+        try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+            }
+            if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Title is required!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "add");
+                return "add-task";
+            }
+
+            if (task.getDescription() == null || task.getDescription().trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Description is required!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "add");
+                return "add-task";
+            }
+
+            if (task.getDueDate() == null) {
+                model.addAttribute("errorMessage", "Due Date is required!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "add");
+                return "add-task";
+            }
+
+            User user = new User();
+            user.setId(userId);
+            task.setUser(user);
+
+            taskService.addTask(task);
+
+            ra.addFlashAttribute("successMessage", "Task added successfully!");
+            return "redirect:/api/tasks";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Failed to add task. Please try again.");
+            model.addAttribute("successMessage", null);
+            model.addAttribute("task", task != null ? task : new Task());
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "add");
             return "add-task";
         }
-        if (task.getDescription() == null || task.getDescription().trim().isEmpty()) {
-            model.addAttribute("errorMessage", "Description is Required!");
-            model.addAttribute("task", task);
-            return "add-task";
-        }
-        if (task.getDueDate() == null) {
-            model.addAttribute("errorMessage", "Due Date is Required!");
-            model.addAttribute("task", task);
-            return "add-task";
-        }
-        taskService.addTask(task);
-        ra.addFlashAttribute("successMessage", "Task added successfully!");
-        return "redirect:/api/tasks";
     }
+
 
     @GetMapping("/update/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model, RedirectAttributes ra, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
-        Task task = taskService.findById(id).orElse(null);
-        if (task == null) {
+    public String showEditForm(
+            @PathVariable Integer id,
+            Model model,
+            RedirectAttributes ra,
+            HttpSession session
+    ) {
+        try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return "redirect:/auth/login";
+            }
+
+            Task task = taskService.findByIdAndUserId(id, userId);
+            if (task == null) {
+                ra.addFlashAttribute("errorMessage", "Task not found.");
+                return "redirect:/api/tasks";
+            }
+
+            if (task.getStatus() == TaskStatus.COMPLETED) {
+                ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
+                return "redirect:/api/tasks";
+            }
+
+            model.addAttribute("task", task);
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "edit");
+
+            model.addAttribute("successMessage", null);
+
+            return "update-task";
+
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Unable to load the task for editing. Please try again.");
             return "redirect:/api/tasks";
         }
-        if (task.getStatus() == TaskStatus.COMPLETED) {
-            ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
-            return "redirect:/api/tasks";
-        }
-        model.addAttribute("task", task);
-        return "update-task";
     }
 
-
     @PostMapping("/update/{id}")
-    public String updateTask(@PathVariable Integer id, @ModelAttribute Task task, Model model, RedirectAttributes ra, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
-        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
-            model.addAttribute("errorMessage", "Title is Required!");
+    public String updateTask(
+            @PathVariable Integer id,
+            @ModelAttribute Task task,
+            Model model,
+            RedirectAttributes ra,
+            HttpSession session
+    ) {
+        try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return "redirect:/auth/login";
+            }
+
+            if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+                model.addAttribute("errorMessage", "Title is required!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "edit");
+                return "update-task";
+            }
+
+            if (task.getDueDate() == null) {
+                model.addAttribute("errorMessage", "Due Date is required!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "edit");
+                return "update-task";
+            }
+
+            Task existingTask = taskService.findByIdAndUserId(id, userId);
+            if (existingTask == null) {
+                ra.addFlashAttribute("errorMessage", "Task not found or you do not have permission to edit it.");
+                return "redirect:/api/tasks";
+            }
+
+            if (existingTask.getStatus() == TaskStatus.COMPLETED) {
+                ra.addFlashAttribute("errorMessage", "Completed tasks cannot be updated.");
+                return "redirect:/api/tasks";
+            }
+
+            task.setId(id);
+            task.setUser(existingTask.getUser());
+            task.setCreatedAt(existingTask.getCreatedAt());
+            if (task.getStatus() == TaskStatus.COMPLETED && existingTask.getStatus() != TaskStatus.COMPLETED) {
+                task.setCompletedAt(LocalDate.now());
+            } else {
+                task.setCompletedAt(existingTask.getCompletedAt());
+            }
+
+            taskService.updateTask(task,userId);
+
+            ra.addFlashAttribute("successMessage", "Task updated successfully!");
+            return "redirect:/api/tasks";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Failed to update the task. Please try again.");
+            model.addAttribute("successMessage", null);
             model.addAttribute("task", task);
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "edit");
             return "update-task";
         }
-        if (task.getDueDate() == null) {
-            model.addAttribute("errorMessage", "Due Date is Required!");
-            model.addAttribute("task", task);
-            return "update-task";
-        }
-        task.setId(id);
-        Task existing = taskService.findById(id).orElse(null);
-        if (existing != null)
-            task.setCreatedAt(existing.getCreatedAt());
-        else
-            task.setCreatedAt(LocalDate.now());
-        if(task.getStatus() == TaskStatus.COMPLETED)
-            task.setCompletedAt(LocalDate.now());
-        taskService.updateTask(task);
-        ra.addFlashAttribute(
-                "successMessage",
-                "Task updated successfully!"
-        );
-        return "redirect:/api/tasks";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteTask(@PathVariable Integer id, Model model, RedirectAttributes ra, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
-        if (taskService.findById(id).isEmpty()) {
-            model.addAttribute("errorMessage", "Task not found!");
+    public String deleteTask(
+            @PathVariable Integer id,
+            RedirectAttributes ra,
+            HttpSession session
+    ) {
+        try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return "redirect:/auth/login";
+            }
+
+            Task task = taskService.findByIdAndUserId(id, userId);
+            if (task == null) {
+                ra.addFlashAttribute("errorMessage", "Task not found or you do not have permission to delete it.");
+                return "redirect:/api/tasks";
+            }
+
+            if (task.getStatus() == TaskStatus.COMPLETED) {
+                ra.addFlashAttribute("errorMessage", "Completed tasks cannot be deleted.");
+                return "redirect:/api/tasks";
+            }
+
+            taskService.deleteTask(id, userId);
+            ra.addFlashAttribute("successMessage", "Task deleted successfully!");
+            return "redirect:/api/tasks";
+
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Failed to delete the task. Please try again.");
             return "redirect:/api/tasks";
         }
-        taskService.deleteTask(id);
-        ra.addFlashAttribute(
-                "successMessage",
-                "Task deleted successfully!"
-        );
-        return "redirect:/api/tasks";
     }
-
 
     @GetMapping("/markAsDone/{id}")
-    public String markAsDone(@PathVariable Integer id, RedirectAttributes ra, HttpSession session) {
-        if(session.getAttribute("userId")==null){
-            return "redirect:/auth/login";
-        }
+    public String markAsDone(
+            @PathVariable Integer id,
+            RedirectAttributes ra,
+            HttpSession session
+    ) {
         try {
-            taskService.markTask(id);
-            ra.addFlashAttribute(
-                    "successMessage", "Task marked as completed!"
-            );
-        } catch (IllegalStateException e) {
-            ra.addFlashAttribute(
-                    "errorMessage", "⚠ " + e.getMessage()
-            );
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return "redirect:/auth/login";
+            }
+
+            Task task = taskService.findByIdAndUserId(id, userId);
+            if (task == null) {
+                ra.addFlashAttribute("errorMessage", "Task not found or you do not have permission to modify it.");
+                return "redirect:/api/tasks";
+            }
+
+            if (task.getStatus() == TaskStatus.COMPLETED) {
+                ra.addFlashAttribute("errorMessage", "Task is already completed.");
+                return "redirect:/api/tasks";
+            }
+
+            taskService.markTask(id, userId);
+            ra.addFlashAttribute("successMessage", "Task marked as completed!");
+
+            return "redirect:/api/tasks";
+
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", "Failed to mark task as completed. Please try again.");
+            return "redirect:/api/tasks";
         }
-        return "redirect:/api/tasks";
     }
+
 }

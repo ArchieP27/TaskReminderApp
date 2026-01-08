@@ -7,8 +7,10 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Task Reminder Application</title>
+    <title>Dashboard | TimeIt</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
     <script th:inline="javascript">
       /*<![CDATA[*/
         let tasksData = [];
@@ -23,36 +25,20 @@
   </head>
 
   <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
     <div id="popup" th:if="${errorMessage}" class="popup-error">
       <span th:text="${errorMessage}"></span>
     </div>
+
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
     <div class="container">
-      <div class="header-area">
-        <div class="logo">
-          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
-          <h1>Task Reminder Application</h1>
-        </div>
-        <div class="header-actions">
-          <a href="/api/tasks/add" class="action-btn add-task-btn">
-            <img th:src="@{/images/plus.png}" class="icon" alt="Add" />
-            Add New Task
-          </a>
-
-          <a th:href="@{/auth/logout}" class="action-btn logout-btn">
-            <img th:src="@{/images/logout.png}" class="icon" alt="Logout" />
-            Logout
-          </a>
-        </div>
-      </div>
-
-      <div
-        th:if="${successMessage}"
-        class="popup-success"
-        style="margin-bottom: 15px"
-      >
-        <span th:text="${successMessage}"></span>
-      </div>
-
       <section class="task-stats-cards">
         <div class="stat-card overdue">
           <div class="stat-count" th:text="${overdueTasks.size()}">0</div>
@@ -489,15 +475,7 @@
         <div id="taskCalendar"></div>
       </div>
     </div>
-
-    <footer>
-      <div class="clock-icon-container">
-        <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time" />
-      </div>
-      <div class="footer-text">
-        Task Reminder App &copy; 2025 - Created By Archie
-      </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <div id="taskModal" class="task-modal-overlay">
       <div class="task-card task-modal-card">
@@ -520,5 +498,15 @@
         </div>
       </div>
     </div>
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    </script>
   </body>
 </html>

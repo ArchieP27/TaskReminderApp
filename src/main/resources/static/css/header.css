@@ -1,0 +1,212 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+
+:root {
+  --color-primary: #5a77f5;
+  --color-primary-dark: #3f51b5;
+  --color-success: #00c853;
+  --color-danger: #ff3b30;
+  --color-warning: #ff9500;
+  --color-background: #f0f2f5;
+  --color-surface: #ffffff;
+  --color-text-dark: #1c1c1e;
+  --color-text-muted: #6c757d;
+  --color-indigo: #5a77f5;
+
+  --gradient-primary: linear-gradient(135deg, #74a0f9 0%, #5a77f5 100%);
+  --gradient-background: linear-gradient(
+    to bottom right,
+    #f8f9fa 0%,
+    #e0e6ed 100%
+  );
+
+  --priority-high: #e53935;
+  --priority-medium: #ff9800;
+  --priority-low: #4caf50;
+
+  --status-completed: var(--color-success);
+  --status-pending: var(--color-warning);
+  --status-inProgress: #1b4dcb;
+}
+
+.header-container {
+  background: var(--gradient-primary);
+  padding: 2vh 0;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  height: 10vh;
+  z-index: 1000;
+  font-family: "Bricolage Grotesque", sans-serif;
+}
+
+.header-area {
+  width: 95%;
+  max-width: 1450px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 25px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  animation: floating-pulse 3s ease-in-out infinite;
+  min-height: 7vh;
+}
+
+.brand-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-name {
+  color: var(--color-primary-dark) !important;
+  font-size: 2.2rem !important;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  margin: 0;
+}
+
+.divider {
+  width: 2px;
+  height: 35px;
+  background: #e0e6ed;
+}
+
+.slogan-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.slogan-top {
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.slogan-bottom {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-primary);
+}
+
+.logo-icon {
+  width: 44px;
+  height: 44px;
+}
+
+@keyframes floating-pulse {
+  0%,
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0 8px 20px rgba(90, 119, 245, 0.2);
+  }
+  50% {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 30px rgba(90, 119, 245, 0.4);
+  }
+}
+
+.user-greeting {
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px 25px;
+  border-radius: 50px;
+  backdrop-filter: blur(8px);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-clock {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 10px 20px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: none;
+}
+
+.dashboard-btn {
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.add-btn {
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.header-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.header-btn.active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(90, 119, 245, 0.3);
+}
+
+.header-btn.active {
+  background: var(--color-indigo);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(90, 119, 245, 0.25);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+@media (max-width: 1150px) {
+  .header-center,
+  .divider,
+  .slogan-stack {
+    display: none;
+  }
+}

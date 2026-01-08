@@ -1,12 +1,170 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>
-        Welcome Page
-    </title>
-</head>
-<body>
-    <h1> Heyy</h1>
-    <p th:text="${message}"></p>
-</body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TimeIt | Master Your Schedule</title>
+    <link rel="stylesheet" th:href="@{/css/landing.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png" />
+  </head>
+  <body>
+    <div class="brand-box">
+      <img th:src="@{/images/logo.png}" class="logo-icon" alt="Logo" />
+      <div class="brand-text">
+        <h1 class="brand-name">TimeIt</h1>
+        <div class="divider"></div>
+        <div class="slogan-stack">
+          <span class="slogan-top">"Seize the day</span>
+          <span class="slogan-bottom">one task at a time"</span>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-badge">🔔 Never Miss a Task</div>
+          <h1>
+            The Most <span class="highlight">Visual</span> Way to Manage Tasks.
+          </h1>
+          <p>
+            Organize, track, and complete your projects efficiently. No clutter,
+            just clarity.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="/auth/register" class="btn-primary">Create Your Account</a>
+            <a href="#features" class="btn-secondary">Explore Features</a>
+          </div>
+
+          <div class="feature-tag-cloud">
+            <span>#Productivity</span>
+            <span>#Focus</span>
+            <span>#TaskManagement</span>
+            <span>#Efficiency</span>
+          </div>
+        </div>
+
+        <div class="hero-visual-complex">
+          <div class="visual-anchor">
+            <img
+              th:src="@{/images/dashboard-mockup.png}"
+              alt="App Dashboard"
+              class="main-dashboard-img"
+            />
+
+            <div class="floating-card goal-card">
+              <div class="progress-ring-mini">85%</div>
+              <div class="card-text">
+                <strong>Daily Goal</strong>
+              </div>
+            </div>
+
+            <div class="task-layout-wrapper">
+              <div class="task-column">
+                <div class="floating-card task-item t1">
+                  <span class="p-badge high">High</span>
+                  <p>Team Sync</p>
+                </div>
+                <div class="floating-card task-item t2">
+                  <span class="p-badge medium">Medium</span>
+                  <p>Design Review</p>
+                </div>
+              </div>
+              <div class="task-column offset-col">
+                <div class="floating-card task-item t3">
+                  <span class="p-badge low">Low</span>
+                  <p>Refactor</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow-strip">
+        <div class="strip-item">
+          <strong>1. Create</strong>
+          <p>Add tasks with ease</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="strip-item">
+          <strong>2. Prioritize</strong>
+          <p>Set urgency levels</p>
+        </div>
+        <div class="arrow">→</div>
+        <div class="strip-item">
+          <strong>3. Complete</strong>
+          <p>Track with visuals</p>
+        </div>
+      </section>
+
+      <section id="features" class="features-section">
+        <div class="section-header">
+          <h2 class="section-title">Everything You Need</h2>
+          <p>Built for the features you use daily in TimeIt.</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card f-blue">
+            <div class="icon-bg">
+              <img
+                th:src="@{/images/icon-dashboard.png}"
+                alt="Views"
+                class="card-icon"
+              />
+            </div>
+            <h3>Multiple Views</h3>
+            <p>Switch between Card View and Table View seamlessly.</p>
+          </div>
+
+          <div class="feature-card f-green">
+            <div class="icon-bg">
+              <img
+                th:src="@{/images/icon-progress.png}"
+                alt="Tracking"
+                class="card-icon"
+              />
+            </div>
+            <h3>Dynamic Tracking</h3>
+            <p>Progress Rings update in real-time for instant feedback.</p>
+          </div>
+
+          <div class="feature-card f-orange">
+            <div class="icon-bg">
+              <img
+                th:src="@{/images/icon-reminder.png}"
+                alt="Alerts"
+                class="card-icon"
+              />
+            </div>
+            <h3>System Popups</h3>
+            <p>Success & Error popups for every action you take.</p>
+          </div>
+
+          <div class="feature-card f-red">
+            <div class="icon-bg">
+              <img
+                th:src="@{/images/icon-priority.png}"
+                alt="Urgency"
+                class="card-icon"
+              />
+            </div>
+            <h3>Urgency Levels</h3>
+            <p>High, Medium, Low priority badges keep focus on main tasks.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-banner">
+        <h2>Your Day, Your Way</h2>
+        <p>
+          TimeIt helps you plan, track, and finish tasks without the stress.
+        </p>
+        <a href="/auth/register" class="btn-cta">Get Started Free</a>
+      </section>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+  </body>
 </html>

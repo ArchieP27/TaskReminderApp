@@ -1,0 +1,53 @@
+<div th:fragment="header" class="header-container">
+  <div class="header-area">
+    <div class="logo brand-box">
+      <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+      <div class="brand-text">
+        <h1 class="brand-name">TimeIt</h1>
+        <div class="divider"></div>
+        <div class="slogan-stack">
+          <span class="slogan-top">"Seize the day</span>
+          <span class="slogan-bottom">one task at a time"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <span class="user-greeting">
+        👋 Hello, <span th:text="${userName}">User</span>!
+      </span>
+    </div>
+
+    <div class="header-right">
+      <div class="header-clock" th:if="${activePage=='dashboard'}">
+        🕒 <span id="liveClock">--:--</span>
+      </div>
+
+      <a
+        th:href="@{/api/tasks}"
+        class="header-btn dashboard-btn"
+        th:classappend="${activePage=='dashboard'} ? ' active'"
+      >
+        <img th:src="@{/images/dashboard.png}" class="btn-icon" alt="" />
+        Dashboard
+      </a>
+
+      <div class="header-actions">
+        <a
+          th:href="@{/api/tasks/add}"
+          class="header-btn add-btn"
+          th:if="${activePage=='dashboard'}"
+          th:classappend="${activePage=='add'} ? ' active'"
+        >
+          <img th:src="@{/images/plus.png}" class="btn-icon" alt="" />
+          Add Task
+        </a>
+
+        <a th:href="@{/auth/logout}" class="header-btn logout-btn">
+          <img th:src="@{/images/logout.png}" class="btn-icon" alt="" />
+          Logout
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

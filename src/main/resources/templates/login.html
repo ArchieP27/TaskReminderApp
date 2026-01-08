@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | TaskFlow</title>
+    <title>Login | TimeIt</title>
     <link rel="stylesheet" href="/css/auth.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
 
@@ -21,14 +22,17 @@
     <div class="blob shape-2"></div>
     <div class="blob shape-3"></div>
 
-    <header class="hero-header">
-      <div class="header-content">
-        <div class="logo">
-          <img src="/images/logo.png" class="logo-icon" alt="Logo" />
-          <h1>Task Reminder Application</h1>
+    <div class="logo brand-box">
+      <img src="/images/logo.png" class="logo-icon" alt="Logo" />
+      <div class="brand-text">
+        <h1 class="brand-name">TimeIt</h1>
+        <div class="divider"></div>
+        <div class="slogan-stack">
+          <span class="slogan-top">"Seize the day</span>
+          <span class="slogan-bottom">one task at a time"</span>
         </div>
       </div>
-    </header>
+    </div>
 
     <div class="content-body">
       <div class="auth-card">
@@ -51,7 +55,7 @@
           <div class="form-subtitle">
             Enter your credentials to access your tasks
           </div>
-          
+
           <form th:action="@{/auth/login}" method="post">
             <div class="input-group">
               <label>Email Address</label>
@@ -84,13 +88,6 @@
       </div>
     </div>
 
-    <footer class="fixed-footer">
-      <div class="clock-icon-container">
-        <img src="/images/clock.png" class="clock-icon" alt="Time" />
-      </div>
-      <div class="footer-text">
-        Task Reminder App &copy; 2025 - Created By Archie
-      </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
   </body>
 </html>

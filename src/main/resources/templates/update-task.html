@@ -7,25 +7,15 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Edit Task</title>
+    <title>Update Task | TimeIt</title>
     <link rel="stylesheet" href="/css/add.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
   <body>
     <div class="main-wrapper">
-      <header class="hero-header">
-        <div class="header-content">
-          <div class="logo">
-            <img src="/images/logo.png" class="logo-icon" alt="Logo" />
-            <h1>Task Reminder Application</h1>
-          </div>
-          <div class="header-actions">
-            <a href="/api/tasks" class="back-link"
-              ><span>&larr;</span> Back to Task List</a
-            >
-          </div>
-        </div>
-      </header>
+      <div th:replace="~{fragments/header :: header}"></div>
 
       <div class="content-body">
         <div class="form-container">
@@ -117,13 +107,6 @@
       </div>
     </div>
 
-    <footer class="fixed-footer">
-      <div class="clock-icon-container">
-        <img th:src="@{/images/clock.png}" class="clock-icon" alt="Time" />
-      </div>
-      <div class="footer-text">
-        Task Reminder App &copy; 2025 - Created By Archie
-      </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
   </body>
 </html>
