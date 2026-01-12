@@ -14,17 +14,17 @@
     <link rel="icon" type="image/png" href="/images/logo.png" />
   </head>
   <body>
-  <div id="popup" th:if="${errorMessage}" class="popup-error">
-    <span th:text="${errorMessage}"></span>
-  </div>
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
 
-  <div
-          th:if="${successMessage}"
-          class="popup-success"
-          style="margin-bottom: 15px"
-  >
-    <span th:text="${successMessage}"></span>
-  </div>
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
     <div th:replace="~{fragments/header :: header}"></div>
     <div class="main-wrapper">
       <div class="content-body">
@@ -79,9 +79,36 @@
                     type="date"
                     id="dueDate"
                     th:field="*{dueDate}"
+                    onchange="updateReminderMax(this.value)"
                     required
                   />
                 </div>
+              </div>
+
+              <div class="form-group flex-1">
+                <label class="reminder-checkbox">
+                  <input
+                    type="checkbox"
+                    id="sendReminder"
+                    th:field="*{reminderSent}"
+                    onclick="toggleReminderTime(this)"
+                  />
+                  <img src="/images/bell.png" alt="Reminder" class="bell-icon" />
+                  Send me a reminder
+                </label>
+              </div>
+
+              <div
+                class="form-group flex-1"
+                id="reminderTimeContainer"
+                style="display: none"
+              >
+                <label for="reminderTime">Reminder Time</label>
+                <input
+                  type="datetime-local"
+                  id="reminderTime"
+                  th:field="*{reminderTime}"
+                />
               </div>
 
               <div class="form-row action-row">
@@ -118,5 +145,49 @@
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+    <script>
+      
+      function updateReminderMax(dueDateValue) {
+    const reminderInput = document.getElementById('reminderTime');
+    if (dueDateValue) {
+        // Sets the maximum date the reminder can be
+        // We add 'T23:59' so they can set a reminder anytime on the actual due date
+        reminderInput.max = dueDateValue + "T23:59";
+        
+        // If current reminder is now invalid, clear it
+        if (reminderInput.value) {
+            const reminderDate = reminderInput.value.split('T')[0];
+            if (reminderDate > dueDateValue) {
+                alert("Reminder reset: It cannot be after the Due Date.");
+                reminderInput.value = "";
+            }
+        }
+    }
+}
+
+// Run on page load to set initial constraint if editing a task
+window.onload = function() {
+    const dueDate = document.getElementById('dueDate').value;
+    if (dueDate) {
+        updateReminderMax(dueDate);
+    }
+    
+    // Your existing toggle logic
+    const checkbox = document.getElementById('sendReminder');
+    toggleReminderTime(checkbox);
+};
+
+      function toggleReminderTime(checkbox) {
+        const container = document.getElementById("reminderTimeContainer");
+        container.style.display = checkbox.checked ? "block" : "none";
+        if (!checkbox.checked) {
+          document.getElementById("reminderTime").value = "";
+        }
+      }
+      window.onload = function () {
+        const checkbox = document.getElementById("sendReminder");
+        toggleReminderTime(checkbox);
+      };
+    </script>
   </body>
 </html>

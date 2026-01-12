@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Reset OTP | TimeIt</title>
+
+    <link rel="stylesheet" href="/css/pswd.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+  </head>
+
+  <body>
+    <div th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div th:if="${successMessage}" class="popup-success">
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <div class="blob shape-1"></div>
+    <div class="blob shape-2"></div>
+    <div class="blob shape-3"></div>
+
+    <div class="forgot-container">
+      <div class="forgot-card">
+        <div class="forgot-title">Verify OTP</div>
+
+        <div class="forgot-subtitle">
+          Enter the 6-digit code sent to your registered email to reset your
+          password.
+        </div>
+
+        <div class="otp-timer center-timer">
+          <img src="/images/hourglass.png" class="otp-icon" />
+          <span id="otp-countdown">05:00</span>
+        </div>
+
+        <form th:action="@{/auth/verify-reset-otp}" method="post">
+          <input type="hidden" name="email" th:value="${email}" />
+
+          <div class="input-group">
+            <label>One-Time Password</label>
+            <input
+              type="text"
+              name="otp"
+              placeholder="● ● ● ● ● ●"
+              maxlength="6"
+              required
+            />
+          </div>
+
+          <input type="submit" value="Verify OTP" class="submit-btn" />
+        </form>
+
+        <div class="back-login">
+          Didn’t receive the code?
+          <form
+            th:action="@{/auth/resend-reset-otp}"
+            method="post"
+            style="display: inline"
+          >
+            <input type="hidden" name="email" th:value="${email}" />
+            <button type="submit" class="text-link">Resend OTP</button>
+          </form>
+        </div>
+
+        <div class="back-login">
+          <a th:href="@{/auth/login}">Back to Login</a>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      const otpExpiryMillis = /*[[${otpExpiryMillis}]]*/ 0;
+      const countdown = document.getElementById("otp-countdown");
+      const submitBtn = document.querySelector(".submit-btn");
+
+      function tick() {
+        const diff = otpExpiryMillis - Date.now();
+
+        if (diff <= 0) {
+          countdown.textContent = "00:00";
+          countdown.style.background = "#ff3b30";
+          submitBtn.disabled = true;
+          clearInterval(timer);
+          return;
+        }
+
+        const m = Math.floor(diff / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
+        countdown.textContent =
+          (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+
+        if (diff > 180000) countdown.style.background = "#00c853";
+        else if (diff > 60000) countdown.style.background = "#ff9500";
+        else countdown.style.background = "#ff3b30";
+      }
+
+      tick();
+      const timer = setInterval(tick, 1000);
+      /*]]>*/
+    </script>
+  </body>
+</html>

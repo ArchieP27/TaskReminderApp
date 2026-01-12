@@ -1,0 +1,360 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;600;700;800&display=swap");
+
+:root {
+  --primary: #5a77f5;
+  --success: #00c853;
+  --danger: #ff3b30;
+  --warning: #ff9500;
+  --text-dark: #1c1c1e;
+  --text-muted: #64748b;
+  --bg: #f0f2f5;
+  --card-bg: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Bricolage Grotesque", sans-serif;
+  background: var(--bg);
+  margin: 0;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.blob {
+  position: fixed;
+  z-index: -1;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.shape-1 {
+  width: 450px;
+  height: 450px;
+  background: #dbe2ff;
+  top: -120px;
+  left: -100px;
+  border-radius: 30% 70% 70% 30%;
+}
+
+.shape-2 {
+  width: 400px;
+  height: 400px;
+  background: #ffe8d6;
+  bottom: -80px;
+  right: -80px;
+  border-radius: 56% 44% 52% 48%;
+}
+
+.shape-3 {
+  width: 260px;
+  height: 260px;
+  background: #d1fae5;
+  top: 20%;
+  right: 12%;
+  border-radius: 50%;
+}
+
+.forgot-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.forgot-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 420px;
+  padding: 45px 40px;
+  border-radius: 22px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.6s ease;
+}
+
+.forgot-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.forgot-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #eef2f6;
+  background: #f8fafc;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(90, 119, 245, 0.12);
+}
+
+input[name="otp"] {
+  letter-spacing: 10px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.otp-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0 10px;
+}
+
+.otp-icon {
+  width: 22px;
+  height: 22px;
+}
+
+#otp-countdown {
+  background: var(--success);
+  color: white;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border-radius: 12px;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+}
+
+.submit-btn {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #00ae49;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 200, 83, 0.25);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.back-login {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.back-login a,
+.back-login .link-button {
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-login a:hover,
+.back-login .link-button:hover {
+  text-decoration: underline;
+}
+
+.popup-error,
+.popup-success {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+}
+
+.popup-error {
+  background: var(--danger);
+}
+
+.popup-success {
+  background: var(--success);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.password-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 24px;
+}
+
+.tooltip-text {
+  position: absolute;
+  bottom: -16px;
+  left: 12px;
+  background: var(--danger);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tooltip-text::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 10px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent var(--danger) transparent;
+}
+
+.tooltip-wrapper.invalid .tooltip-text {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-wrapper.invalid input {
+  border-color: var(--danger);
+}
+
+input[type="password"] {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 2px solid #eef2f6;
+  background: #f8fafc;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(90, 119, 245, 0.12);
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled,
+.submit-btn:disabled:hover {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.inline-form {
+  display: inline;
+}
+
+.text-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 800;
+  color: var(--primary);
+  cursor: pointer;
+  line-height: inherit;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}

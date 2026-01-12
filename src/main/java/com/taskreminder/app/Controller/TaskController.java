@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -90,6 +91,7 @@ public class TaskController {
             model.addAttribute("size", pageSize);
             model.addAttribute("userName", session.getAttribute("name"));
             model.addAttribute("activePage", "dashboard");
+            model.addAttribute("upcomingReminders", taskService.getUpcomingReminders(userId));
 
             return "tasks";
         }
@@ -133,6 +135,7 @@ public class TaskController {
         model.addAttribute("allTasks", allTasks);
         model.addAttribute("userName", session.getAttribute("name"));
         model.addAttribute("activePage", "dashboard");
+        model.addAttribute("upcomingReminders", taskService.getUpcomingReminders(userId));
 
         boolean noTasksAtAll = allTasks.isEmpty();
         boolean noResultsAfterFilter = taskPage.isEmpty() && !noTasksAtAll;
@@ -220,7 +223,46 @@ public class TaskController {
             user.setId(userId);
             task.setUser(user);
 
+            LocalDate today = LocalDate.now();
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            if (task.getDueDate().isBefore(today)) {
+                model.addAttribute("errorMessage", "Due Date cannot be in the past!");
+                model.addAttribute("task", task);
+                model.addAttribute("userName", session.getAttribute("name"));
+                model.addAttribute("activePage", "add");
+                return "add-task";
+            }
+            if (Boolean.TRUE.equals(task.getReminderSent())) {
+                if (task.getReminderTime() == null) {
+                    model.addAttribute("errorMessage", "Please select a reminder time.");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+                    model.addAttribute("activePage", "add");
+                    return "add-task";
+                }
+                if (task.getReminderTime().isBefore(now)) {
+                    model.addAttribute("errorMessage", "Reminder time cannot be in the past!");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+                    model.addAttribute("activePage", "add");
+                    return "add-task";
+                }
+                if (task.getReminderTime().toLocalDate().isAfter(task.getDueDate())) {
+                    model.addAttribute("errorMessage", "Reminder cannot be set for a date after the Due Date!");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+                    model.addAttribute("activePage", "add");
+                    return "add-task";
+                }
+                task.setReminderSent(false);
+                task.setReminderTime(task.getReminderTime().withSecond(0).withNano(0));
+            } else {
+                task.setReminderSent(false);
+                task.setReminderTime(null);
+            }
+
             taskService.addTask(task);
+
 
             ra.addFlashAttribute("successMessage", "Task added successfully!");
             return "redirect:/api/tasks";
@@ -278,10 +320,18 @@ public class TaskController {
     public String updateTask(
             @PathVariable Integer id,
             @ModelAttribute Task task,
+            BindingResult result,
             Model model,
             RedirectAttributes ra,
             HttpSession session
     ) {
+        if (result.hasErrors()) {
+            model.addAttribute("errorMessage", "Invalid input. Please check all fields.");
+            model.addAttribute("userName", session.getAttribute("name"));
+            model.addAttribute("activePage", "edit");
+            return "update-task";
+        }
+
         try {
             Integer userId = (Integer) session.getAttribute("userId");
             if (userId == null) {
@@ -324,7 +374,43 @@ public class TaskController {
                 task.setCompletedAt(existingTask.getCompletedAt());
             }
 
-            taskService.updateTask(task,userId);
+            LocalDate today = LocalDate.now();
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+            if (Boolean.TRUE.equals(task.getReminderSent())) {
+                if (task.getReminderTime() == null) {
+                    model.addAttribute("errorMessage", "Please select a reminder time.");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+                    model.addAttribute("activePage", "edit");
+                    return "update-task";
+                }
+
+                if (task.getReminderTime().isBefore(now)) {
+                    model.addAttribute("errorMessage", "Reminder time cannot be in the past!");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+                    model.addAttribute("activePage", "edit");
+                    return "update-task";
+                }
+
+                if (task.getReminderTime().toLocalDate().isAfter(task.getDueDate())) {
+                    model.addAttribute("errorMessage", "Reminder cannot be set for a date after the Due Date!");
+                    model.addAttribute("task", task);
+                    model.addAttribute("userName", session.getAttribute("name"));
+
+                    model.addAttribute("activePage", "edit");
+                    return "update-task";
+                }
+                task.setReminderSent(false);
+                task.setReminderTime(task.getReminderTime().withSecond(0).withNano(0));
+            } else {
+                task.setReminderSent(false);
+
+                task.setReminderTime(null);
+            }
+            taskService.updateTask(task, userId);
+
 
             ra.addFlashAttribute("successMessage", "Task updated successfully!");
             return "redirect:/api/tasks";

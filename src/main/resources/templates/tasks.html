@@ -39,6 +39,45 @@
       <span th:text="${successMessage}"></span>
     </div>
     <div class="container">
+      <div class="reminder-float">
+        <button
+          class="reminder-btn"
+          id="reminderBtn"
+          aria-label="Upcoming reminders"
+        >
+          <img src="/images/bell-icon.png" alt="Reminders" />
+          <span
+            class="reminder-count"
+            th:text="${upcomingReminders.size()}"
+          ></span>
+        </button>
+
+        <span class="reminder-tooltip">Upcoming reminders</span>
+
+        <div class="reminder-panel" id="reminderPanel">
+          <table class="reminder-table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Reminder Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="task : ${upcomingReminders}">
+                <td th:text="${task.title}"></td>
+                <td
+                  th:text="${#temporals.format(task.reminderTime, 'dd MMM yyyy, hh:mm a')}"
+                ></td>
+              </tr>
+
+              <tr th:if="${upcomingReminders.isEmpty()}">
+                <td colspan="2">No upcoming reminders</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <section class="task-stats-cards">
         <div class="stat-card overdue">
           <div class="stat-count" th:text="${overdueTasks.size()}">0</div>
@@ -94,7 +133,7 @@
         </div>
       </section>
 
-      <form action="/api/tasks" method="get">
+      <form action="/api/tasks" method="get" th:if="${view != 'calendar'}">
         <div>
           <label for="searchInput">Search Title</label>
           <input
@@ -215,7 +254,7 @@
         >
       </div>
 
-      <table id="tableView" th:if="${view=='table'}">
+      <table id="tableView" th:if="${view=='table'}" class="table">
         <thead>
           <tr>
             <th>Id</th>
@@ -499,6 +538,32 @@
       </div>
     </div>
     <script>
+      const reminderBtn = document.getElementById("reminderBtn");
+      const reminderPanel = document.getElementById("reminderPanel");
+
+      reminderBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        reminderPanel.classList.toggle("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (
+          !reminderPanel.contains(e.target) &&
+          !reminderBtn.contains(e.target)
+        ) {
+          reminderPanel.classList.remove("show");
+        }
+      });
+
+      const reminderTooltip = document.querySelector(".reminder-tooltip");
+      reminderBtn.addEventListener("mouseenter", () => {
+        reminderTooltip.classList.add("tooltip-show");
+        setTimeout(
+          () => reminderTooltip.classList.remove("tooltip-show"),
+          1500
+        );
+      });
+
       function updateClock() {
         const now = new Date();
         const time = now.toLocaleTimeString();

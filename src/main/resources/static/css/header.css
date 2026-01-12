@@ -35,7 +35,7 @@
   position: sticky;
   top: 0;
   height: 10vh;
-  z-index: 1000;
+  z-index: 10000;
   font-family: "Bricolage Grotesque", sans-serif;
 }
 
@@ -191,10 +191,9 @@
 }
 
 .header-btn.active {
-  background: var(--color-indigo);
-  color: #ffffff;
+  opacity: 0.5;
+  disabled: true;
   box-shadow: 0 8px 20px rgba(90, 119, 245, 0.25);
-  transform: translateY(-2px);
 }
 
 .btn-icon {

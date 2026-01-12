@@ -6,9 +6,12 @@ import enums.TaskStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -70,4 +73,23 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
             LocalDate date,
             TaskStatus status
     );
+
+    @Query("SELECT t FROM Task t WHERE t.reminderSent = false AND t.reminderTime IS NOT NULL AND t.reminderTime <= :now")
+    List<Task> findTasksForReminder(@Param("now") LocalDateTime now);
+
+    @Query("""
+            SELECT t FROM Task t
+            WHERE t.user.id = :userId
+            AND t.reminderTime IS NOT NULL
+            AND t.reminderSent = false
+            AND t.reminderTime BETWEEN :now AND :future
+            ORDER BY t.reminderTime ASC
+            """)
+    List<Task> findUpcomingRemindersForUser(
+            @Param("userId") Integer userId,
+            @Param("now") LocalDateTime now,
+            @Param("future") LocalDateTime future
+    );
+
+
 }

@@ -24,6 +24,8 @@ public class User {
 
     private String otp;
     private LocalDateTime otpExpiry;
+    private Integer otpAttempts = 0;
+    private LocalDateTime otpRequestedTime;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -36,6 +38,8 @@ public class User {
     public void clearOtp() {
         this.otp = null;
         this.otpExpiry = null;
+        this.otpAttempts=0;
+        this.otpRequestedTime=null;
     }
 
     public User(){}
@@ -48,6 +52,8 @@ public class User {
         this.verified = verified;
         this.otp=otp;
         this.createdAt = createdAt;
+        this.otpAttempts=0;
+        this.otpRequestedTime=null;
     }
 
     public Integer getId() {
@@ -113,4 +119,19 @@ public class User {
     public void setOtpExpiry(LocalDateTime otpExpiry){
         this.otpExpiry = otpExpiry;
     }
+
+    public Integer getOtpAttempts() {
+        return otpAttempts;
+    }
+    public void setOtpAttempts(Integer otpAttempts) {
+        this.otpAttempts = otpAttempts;
+    }
+
+    public LocalDateTime getOtpRequestedTime() {
+        return otpRequestedTime;
+    }
+    public void setOtpRequestedTime(LocalDateTime otpRequestedTime) {
+        this.otpRequestedTime = otpRequestedTime;
+    }
+
 }

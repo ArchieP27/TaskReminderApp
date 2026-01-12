@@ -403,22 +403,65 @@ input:focus {
   font-weight: 800;
 }
 
-.switch-auth .link-button {
-  border: none;
-  padding: 0;
-  font: "Bricolage Grotesque", sans-serif;
-  background-color: white;
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 800;
+.inline-form {
+  display: inline;
 }
 
-.link-button:hover {
+.switch-auth .link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 800;
+  color: var(--primary);
+  cursor: pointer;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
+.switch-auth .link-button:hover {
   text-decoration: underline;
 }
 
 .switch-auth a:hover {
   text-decoration: underline;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 5px;
+}
+
+.forgot-password a {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 2px;
+  transition: color 0.25s ease;
+}
+
+.forgot-password a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--primary);
+  transition: width 0.25s ease;
+}
+
+.forgot-password a:hover {
+  color: var(--color-primary-dark);
+}
+
+.forgot-password a:hover::after {
+  width: 100%;
 }
 
 @keyframes slideUp {

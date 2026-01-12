@@ -29,7 +29,7 @@ body {
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 1000000;
   animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
 }
 
@@ -212,6 +212,31 @@ select:focus {
   transition: 0.3s;
   width: 100%;
   color: white !important;
+}
+
+.reminder-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.reminder-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.bell-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.reminder-checkbox input:checked + .bell-icon {
+  transform: scale(1.15) rotate(-8deg);
+  opacity: 1;
 }
 
 input[type="submit"]:not(.update-btn) {

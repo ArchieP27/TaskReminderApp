@@ -56,6 +56,10 @@
             Enter your credentials to access your tasks
           </div>
 
+          <div class="forgot-password">
+            <a th:href="@{/auth/forgot-password}">Forgot Password?</a>
+          </div>
+
           <form th:action="@{/auth/login}" method="post">
             <div class="input-group">
               <label>Email Address</label>

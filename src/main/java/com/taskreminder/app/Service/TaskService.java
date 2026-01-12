@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -99,6 +99,7 @@ public class TaskService {
     }
 
     public List<Task> getAllTasksByUser(Integer userId) {
+
         return taskRepository.findByUser_Id(userId);
     }
 
@@ -117,4 +118,11 @@ public class TaskService {
         LocalDate today = LocalDate.now();
         return taskRepository.findByUser_IdAndDueDateBeforeAndStatusNot(userId, today, TaskStatus.COMPLETED);
     }
+
+    public List<Task> getUpcomingReminders(Integer userId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime future = now.plusHours(24);
+        return taskRepository.findUpcomingRemindersForUser(userId, now, future);
+    }
+
 }

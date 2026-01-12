@@ -69,10 +69,10 @@ public class AuthController {
     ) {
         model.addAttribute("email", email);
         OtpRequest otpRequest = new OtpRequest();
-        if(email != null) {
+        if (email != null) {
             Optional<User> userOpt = userService.findByEmail(email);
             otpRequest.setEmail(email);
-            if(userOpt.isPresent() && userOpt.get().getOtpExpiry() != null) {
+            if (userOpt.isPresent() && userOpt.get().getOtpExpiry() != null) {
                 long expiryMillis = userOpt.get().getOtpExpiry()
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
@@ -80,7 +80,7 @@ public class AuthController {
                 model.addAttribute("otpExpiryMillis", expiryMillis);
             }
         }
-        model.addAttribute("otpRequest",otpRequest);
+        model.addAttribute("otpRequest", otpRequest);
         return "verify-otp";
     }
 
@@ -89,7 +89,7 @@ public class AuthController {
             @ModelAttribute("otpRequest") OtpRequest otpRequest,
             RedirectAttributes redirectAttributes
     ) {
-        String response = userService.verifyOtp(otpRequest.getEmail(),otpRequest.getOtp());
+        String response = userService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
 
         if (response.contains("successfully")) {
             redirectAttributes.addFlashAttribute("successMessage", response);
@@ -195,4 +195,106 @@ public class AuthController {
         session.invalidate();
         return ResponseEntity.ok("Logged out successfully");
     }
+
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(
+            @RequestParam String email,
+            Model model
+    ) {
+        String result = userService.sendResetOtp(email);
+
+        if (!result.startsWith("OTP sent")) {
+            model.addAttribute("errorMessage", result);
+            return "forgot-password";
+        }
+
+        model.addAttribute("successMessage", result);
+        model.addAttribute("email", email);
+        Optional<User> userOpt = userService.findByEmail(email);
+        if (userOpt.isPresent() && userOpt.get().getOtpExpiry() != null) {
+            long expiryMillis = userOpt.get().getOtpExpiry()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli();
+            model.addAttribute("otpExpiryMillis", expiryMillis);
+        }
+
+        return "verify-reset-otp";
+    }
+    @PostMapping("/verify-reset-otp")
+    public String verifyResetOtp(
+            @RequestParam String email,
+            @RequestParam String otp,
+            HttpSession session,
+            Model model
+    ) {
+        String result = userService.verifyResetOtp(email, otp, session);
+
+        if (!result.contains("successfully")) {
+            model.addAttribute("errorMessage", result);
+            model.addAttribute("email", email);
+            return "verify-reset-otp";
+        }
+
+        return "redirect:/auth/reset-password?email=" + email;
+    }
+
+    @GetMapping("/reset-password")
+    public String showResetPassword(@RequestParam String email, Model model) {
+        model.addAttribute("email", email);
+        return "reset-password";
+    }
+
+    @PostMapping("/resend-reset-otp")
+    public String resendResetOtp(
+            @RequestParam String email,
+            Model model
+    ) {
+        String response = userService.sendResetOtp(email);
+
+        if (!response.startsWith("OTP sent")) {
+            model.addAttribute("errorMessage", response);
+        } else {
+            model.addAttribute("successMessage", response);
+        }
+
+        model.addAttribute("email", email);
+
+        Optional<User> userOpt = userService.findByEmail(email);
+        if (userOpt.isPresent() && userOpt.get().getOtpExpiry() != null) {
+            long expiryMillis = userOpt.get().getOtpExpiry()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli();
+            model.addAttribute("otpExpiryMillis", expiryMillis);
+        }
+
+        return "verify-reset-otp";
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            HttpSession session,
+            Model model
+    ) {
+        String result = userService.resetPassword(email, password, confirmPassword, session);
+
+        if (!result.startsWith("Password reset successful")) {
+            model.addAttribute("errorMessage", result);
+            model.addAttribute("email", email);
+            return "reset-password";
+        }
+
+        model.addAttribute("successMessage", result);
+        return "login";
+    }
+
 }

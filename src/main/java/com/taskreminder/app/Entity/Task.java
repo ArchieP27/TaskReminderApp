@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="task")
@@ -27,6 +28,12 @@ public class Task {
     private LocalDate createdAt;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate completedAt;
+
+    @Column(nullable = true)
+    private Boolean reminderSent = false;
+    @Column(nullable = true)
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime reminderTime;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -74,6 +81,22 @@ public class Task {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean getReminderSent() {
+        return reminderSent;
+    }
+
+    public void setReminderSent(boolean reminderSent) {
+        this.reminderSent = reminderSent;
+    }
+
+    public LocalDateTime getReminderTime() {
+        return reminderTime;
+    }
+
+    public void setReminderTime(LocalDateTime reminderTime) {
+        this.reminderTime = reminderTime;
     }
 
     public void setDescription(String description) {
