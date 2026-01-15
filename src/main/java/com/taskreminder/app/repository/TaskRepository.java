@@ -1,6 +1,6 @@
-package com.taskreminder.app.Repository;
+package com.taskreminder.app.repository;
 
-import com.taskreminder.app.Entity.Task;
+import com.taskreminder.app.entity.Task;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import org.springframework.data.domain.Page;

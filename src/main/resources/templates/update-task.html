@@ -25,9 +25,10 @@
     >
       <span th:text="${successMessage}"></span>
     </div>
-    <div class="main-wrapper">
-      <div th:replace="~{fragments/header :: header}"></div>
 
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="main-wrapper">
       <div class="content-body">
         <div class="form-container">
           <div class="form-sidebar">
@@ -178,6 +179,15 @@
           }
         }
       }
+
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
     </script>
   </body>
 </html>

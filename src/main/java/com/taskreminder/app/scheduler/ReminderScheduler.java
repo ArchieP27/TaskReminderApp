@@ -1,8 +1,8 @@
 package com.taskreminder.app.scheduler;
 
-import com.taskreminder.app.Entity.Task;
-import com.taskreminder.app.Repository.TaskRepository;
-import com.taskreminder.app.Service.EmailService;
+import com.taskreminder.app.entity.Task;
+import com.taskreminder.app.repository.TaskRepository;
+import com.taskreminder.app.service.EmailService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

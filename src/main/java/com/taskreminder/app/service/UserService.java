@@ -1,12 +1,18 @@
-package com.taskreminder.app.Service;
+package com.taskreminder.app.service;
 
-import com.taskreminder.app.Entity.User;
-import com.taskreminder.app.Repository.UserRepository;
+import com.taskreminder.app.dto.UpdateProfileRequest;
+import com.taskreminder.app.entity.User;
+import com.taskreminder.app.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -20,11 +26,12 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
     private static final int OTP_EXPIRY_MINUTES = 5;
     private static final int OTP_RESEND_COOLDOWN_SECONDS = 30;
     private static final int MAX_OTP_ATTEMPTS = 5;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     public String register(User user) {
 
         if (user.getName() == null || user.getName().isBlank() ||
@@ -82,9 +89,9 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        if (!user.isVerified()) {
-            return "User is not verified. Please verify OTP first";
-        }
+//        if (!user.isVerified()) {
+//            return "User is not verified. Please verify OTP first";
+//        }
 
         // BCrypt Password Migration
 //        if (user.getPassword().equals(password)) {
@@ -337,5 +344,71 @@ public class UserService {
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    public Optional<User> getUserById(Integer userId) {
+        return userRepository.findById(userId);
+    }
+
+    public void updateProfile(Integer userId, UpdateProfileRequest dto) {
+
+        User user = getUserById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new RuntimeException("Username cannot be empty");
+        }
+        String name = dto.getName().trim();
+        if (name.length() < 3 || name.length() > 30) {
+            throw new RuntimeException("Username must be between 3 and 30 characters");
+        }
+        if (!name.matches("^[a-zA-Z0-9_ ]+$")) {
+            throw new RuntimeException("Username contains invalid characters");
+        }
+
+        if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("Email cannot be empty");
+        }
+        String email = dto.getEmail().trim().toLowerCase();
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new RuntimeException("Invalid email format");
+        }
+
+        boolean emailChanged = !email.equalsIgnoreCase(user.getEmail());
+
+        user.setName(name);
+        user.setEmail(email);
+
+        if (emailChanged) {
+            user.setVerified(false);
+        }
+
+        if (dto.getProfileImage() != null && !dto.getProfileImage().isEmpty()) {
+            long maxSize = 2 * 1024 * 1024;
+            if (dto.getProfileImage().getSize() > maxSize) {
+                throw new RuntimeException("Profile image must be less than 2MB");
+            }
+
+            String contentType = dto.getProfileImage().getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new RuntimeException("Only image files are allowed");
+            }
+
+            String uploadDir = "uploads/profiles/";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            String filename = "user_" + userId + ".jpg";
+            Path filePath = Paths.get(uploadDir, filename);
+
+            try {
+                Files.write(filePath, dto.getProfileImage().getBytes());
+                user.setProfileImage("/uploads/profiles/" + filename);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload profile image");
+            }
+        }
+        userRepository.save(user);
+    }
+
 
 }

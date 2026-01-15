@@ -1,4 +1,4 @@
-package com.taskreminder.app.Controller;
+package com.taskreminder.app.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

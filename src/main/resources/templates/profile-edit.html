@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile | TimeIt</title>
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/profile-edit.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+  </head>
+  <body>
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="profile-page">
+      <div class="profile-blob blob-one"></div>
+      <div class="profile-blob blob-two"></div>
+
+      <div class="profile-card-horizontal">
+        <div class="auth-sidebar">
+          <div class="sidebar-center-content">
+            <div class="sidebar-badge">Account</div>
+            <h2>Settings</h2>
+
+            <p>Manage your profile and security preferences.</p>
+          </div>
+        </div>
+
+        <div class="auth-form-scrollable">
+          <a href="/profile" class="back-link">
+            <span class="back-arrow">←</span> Back to Profile
+          </a>
+
+          <div class="form-title">Edit Profile</div>
+
+          <form
+            th:action="@{/profile/edit}"
+            method="post"
+            enctype="multipart/form-data"
+            id="profileForm"
+          >
+            <div class="pfp-container">
+              <label
+                class="profile-image-wrapper"
+                onclick="document.getElementById('fileInput').click()"
+              >
+                <img
+                  th:src="${user.profileImage + '?v=' + profileImageVersion}"
+                  alt="Profile Image"
+                  id="previewImage"
+                />
+
+                <div class="edit-overlay"><span>✏️ Change</span></div>
+              </label>
+              <input
+                type="file"
+                name="profileImage"
+                id="fileInput"
+                accept="image/png,image/jpeg,image/jpg"
+                style="display: none"
+                onchange="validateAndPreviewImage()"
+              />
+              <small class="error-text" id="imageError"></small>
+              <h3 class="sidebar-username" th:text="${user.name}">Username</h3>
+            </div>
+
+            <div class="input-group">
+              <label>Username</label>
+              <input
+                type="text"
+                name="name"
+                th:value="${profile.name}"
+                required
+              />
+              <small class="error-text" id="nameError"></small>
+            </div>
+
+            <div class="input-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                th:value="${profile.email}"
+                required
+              />
+              <small class="error-text" id="emailError"></small>
+            </div>
+
+            <button type="submit" class="submit-btn">Update Profile</button>
+          </form>
+
+          <div th:if="${!user.verified}" class="verify-section">
+            <div class="verify-trigger" id="verifyToggle">
+              <span>Verify Email Address</span>
+              <span id="toggleIcon">+</span>
+            </div>
+
+            <div
+              id="otpSection"
+              class="otp-container"
+              th:classappend="${otpSent} ? 'show' : ''"
+            >
+              <div class="otp-header">
+                <div class="otp-timer">
+                  <img
+                    src="/images/hourglass.png"
+                    alt="Hourglass"
+                    class="otp-icon"
+                  />
+                  <span id="otp-countdown">05:00</span>
+                </div>
+                <form th:action="@{/profile/send-otp}" method="post">
+                  <button type="submit" class="link-button">Send OTP</button>
+                </form>
+              </div>
+              <form
+                th:action="@{/profile/verify-otp}"
+                method="post"
+                class="verify-form"
+              >
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="6-Digit Code"
+                  maxlength="6"
+                  class="otp-field"
+                />
+                <button type="submit" class="verify-submit-btn">Verify</button>
+              </form>
+              <small class="error-text" id="otpError"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+      const toggle = document.getElementById("verifyToggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          const section = document.getElementById("otpSection");
+          const icon = document.getElementById("toggleIcon");
+          const isVisible = section.classList.toggle("show");
+          icon.textContent = isVisible ? "-" : "+";
+        });
+      }
+
+      function previewFile() {
+        const preview = document.getElementById("previewImage");
+        const file = document.getElementById("fileInput").files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => (preview.src = reader.result);
+        if (file) reader.readAsDataURL(file);
+      }
+
+      const otpExpiryMillis = /*[[${otpExpiryMillis}]]*/ 0;
+      const countdownElement = document.getElementById("otp-countdown");
+      if (otpExpiryMillis > 0) {
+        setInterval(() => {
+          const diff = otpExpiryMillis - Date.now();
+          if (diff <= 0) {
+            countdownElement.textContent = "00:00";
+            countdownElement.style.background = "#ff3b30";
+            return;
+          }
+          const m = Math.floor(diff / 60000);
+          const s = Math.floor((diff % 60000) / 1000);
+          countdownElement.textContent = `${m.toString().padStart(2, "0")}:${s
+            .toString()
+            .padStart(2, "0")}`;
+
+          if (diff / 1000 > 180) countdownElement.style.background = "#2ecc71";
+          else if (diff / 1000 > 60)
+            countdownElement.style.background = "#f1c40f";
+          else countdownElement.style.background = "#e67e22";
+        }, 1000);
+      }
+
+      function updateClock() {
+        const clock = document.getElementById("liveClock");
+        if (!clock) return;
+        const now = new Date();
+        clock.textContent = now.toLocaleTimeString();
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    </script>
+
+    <script>
+      const form = document.getElementById("profileForm");
+
+      function validateAndPreviewImage() {
+        const fileInput = document.getElementById("fileInput");
+        const preview = document.getElementById("previewImage");
+        const error = document.getElementById("imageError");
+        error.textContent = "";
+
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+        const maxSize = 2 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+          error.textContent = "Only JPG and PNG images are allowed";
+          fileInput.value = "";
+          return;
+        }
+
+        if (file.size > maxSize) {
+          error.textContent = "Image size must be under 2MB";
+          fileInput.value = "";
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => (preview.src = reader.result);
+        reader.readAsDataURL(file);
+      }
+
+      form.addEventListener("submit", function (e) {
+        let valid = true;
+
+        const name = document.querySelector("input[name='name']");
+        const nameError = document.getElementById("nameError");
+        nameError.textContent = "";
+
+        if (name.value.trim().length < 3) {
+          nameError.textContent = "Username must be at least 3 characters";
+          valid = false;
+        }
+
+        const email = document.querySelector("input[name='email']");
+        const emailError = document.getElementById("emailError");
+        emailError.textContent = "";
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value.trim())) {
+          emailError.textContent = "Enter a valid email address";
+          valid = false;
+        }
+
+        if (!valid) e.preventDefault();
+      });
+
+      const otpField = document.querySelector("input[name='otp']");
+      if (otpField) {
+        otpField.addEventListener("input", () => {
+          otpField.value = otpField.value.replace(/\D/g, "").slice(0, 6);
+        });
+      }
+    </script>
+  </body>
+</html>

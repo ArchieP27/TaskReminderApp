@@ -1,7 +1,7 @@
-package com.taskreminder.app.Service;
+package com.taskreminder.app.service;
 
-import com.taskreminder.app.Entity.Task;
-import com.taskreminder.app.Repository.TaskRepository;
+import com.taskreminder.app.entity.Task;
+import com.taskreminder.app.repository.TaskRepository;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;

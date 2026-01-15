@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | TimeIt</title>
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+  </head>
+  <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <script>
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+  </script>
+  </body>
+</html>

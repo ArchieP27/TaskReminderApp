@@ -1,4 +1,4 @@
-package com.taskreminder.app.Entity;
+package com.taskreminder.app.entity;
 
 import enums.TaskPriority;
 import enums.TaskStatus;

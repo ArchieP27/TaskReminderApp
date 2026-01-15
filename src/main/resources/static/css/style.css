@@ -93,6 +93,19 @@
   opacity: 0.6;
 }
 
+html {
+  scrollbar-width: none;
+}
+
+body {
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
 body {
   font-family: "Bricolage Grotesque", sans-serif;
   background: var(--gradient-background);
@@ -462,6 +475,10 @@ form input[type="submit"],
     transform 0.2s ease;
 }
 
+.no-tasks-row {
+  text-align: center;
+}
+
 .table tr:hover {
   background-color: #f0f3f6;
   box-shadow: inset 5px 0 0 0 var(--color-primary),
@@ -605,7 +622,7 @@ form input[type="submit"],
 
 .card-view {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 30px;
   margin-top: 30px;
 }

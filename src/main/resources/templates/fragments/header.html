@@ -14,40 +14,50 @@
 
     <div class="header-center">
       <span class="user-greeting">
-        👋 Hello, <span th:text="${userName}">User</span>!
+        👋 Hello, <span th:text="${user.name}">User</span>!
       </span>
     </div>
 
     <div class="header-right">
-      <div class="header-clock" th:if="${activePage=='dashboard'}">
-        🕒 <span id="liveClock">--:--</span>
-      </div>
+      <div class="header-clock">🕒 <span id="liveClock">--:--</span></div>
 
       <a
-        th:href="@{/api/tasks}"
-        class="header-btn dashboard-btn"
+        th:href="@{/api/dashboard}"
+        class="header-btn nav-btn"
         th:classappend="${activePage=='dashboard'} ? ' active'"
       >
-        <img th:src="@{/images/dashboard.png}" class="btn-icon" alt="" />
+        <img src="/images/dashboard.png" class="btn-icon" alt="" />
         Dashboard
       </a>
 
-      <div class="header-actions">
-        <a
-          th:href="@{/api/tasks/add}"
-          class="header-btn add-btn"
-          th:if="${activePage=='dashboard'}"
-          th:classappend="${activePage=='add'} ? ' active'"
-        >
-          <img th:src="@{/images/plus.png}" class="btn-icon" alt="" />
-          Add Task
-        </a>
+      <a
+        th:href="@{/api/tasks}"
+        class="header-btn nav-btn"
+        th:classappend="${activePage=='tasks'} ? ' active'"
+      >
+        <img src="/images/tasks.png" class="btn-icon" alt="" />
+        Tasks
+      </a>
 
-        <a th:href="@{/auth/logout}" class="header-btn logout-btn">
-          <img th:src="@{/images/logout.png}" class="btn-icon" alt="" />
-          Logout
-        </a>
-      </div>
+      <a
+        th:href="@{/api/tasks/add}"
+        class="header-btn add-btn"
+        th:classappend="${activePage=='add'} ? ' active'"
+      >
+        <img src="/images/plus.png" class="btn-icon" alt="" />
+        Add Task
+      </a>
+
+      <a th:href="@{/profile}" class="profile-avatar" title="View Profile">
+        <img
+          th:src="${user != null ? user.profileImage : '/images/profile.jpg'}"
+          alt="Profile"
+        />
+      </a>
+
+      <a th:href="@{/auth/logout}" class="logout-icon" title="Logout">
+        <img src="/images/logout.png" alt="Logout" />
+      </a>
     </div>
   </div>
 </div>

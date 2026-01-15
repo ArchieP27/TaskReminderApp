@@ -1,8 +1,7 @@
 package com.taskreminder.app.service;
 
-import com.taskreminder.app.Entity.Task;
-import com.taskreminder.app.Repository.TaskRepository;
-import com.taskreminder.app.Service.TaskService;
+import com.taskreminder.app.entity.Task;
+import com.taskreminder.app.repository.TaskRepository;
 import enums.TaskStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

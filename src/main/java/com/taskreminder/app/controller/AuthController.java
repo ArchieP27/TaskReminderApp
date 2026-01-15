@@ -1,8 +1,8 @@
-package com.taskreminder.app.Controller;
+package com.taskreminder.app.controller;
 
-import com.taskreminder.app.Entity.User;
-import com.taskreminder.app.Repository.UserRepository;
-import com.taskreminder.app.Service.UserService;
+import com.taskreminder.app.entity.User;
+import com.taskreminder.app.repository.UserRepository;
+import com.taskreminder.app.service.UserService;
 import com.taskreminder.app.dto.LoginRequest;
 import com.taskreminder.app.dto.OtpRequest;
 import com.taskreminder.app.dto.RegisterRequest;
@@ -92,6 +92,7 @@ public class AuthController {
         String response = userService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp());
 
         if (response.contains("successfully")) {
+            redirectAttributes.addFlashAttribute("loginRequest", new LoginRequest(otpRequest.getEmail()));
             redirectAttributes.addFlashAttribute("successMessage", response);
             return "redirect:/auth/login";
         }
@@ -101,7 +102,10 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String showLoginForm(Model model) {
+        if (!model.containsAttribute("loginRequest")) {
+            model.addAttribute("loginRequest", new LoginRequest());
+        }
         return "login";
     }
 
@@ -119,6 +123,7 @@ public class AuthController {
         }
 
         redirectAttributes.addFlashAttribute("errorMessage", response);
+        redirectAttributes.addFlashAttribute("loginRequest", new LoginRequest(email));
         return "redirect:/auth/login";
     }
 

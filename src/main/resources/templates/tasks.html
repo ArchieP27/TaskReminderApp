@@ -7,7 +7,7 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Dashboard | TimeIt</title>
+    <title>Tasks | TimeIt</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/footer.css" />
@@ -38,6 +38,7 @@
     >
       <span th:text="${successMessage}"></span>
     </div>
+
     <div class="container">
       <div class="reminder-float">
         <button
@@ -269,6 +270,14 @@
           </tr>
         </thead>
         <tbody>
+          <tr th:if="${#lists.isEmpty(tasks)}">
+            <td colspan="9" class="no-tasks-row" style="text-align: center">
+              No tasks found.
+              <a th:href="@{/api/tasks/add}" class="add-task-link">
+                Click to add your first task
+              </a>
+            </td>
+          </tr>
           <tr
             th:each="task : ${tasks}"
             th:class="|task-row priority-${task.priority.label}|"

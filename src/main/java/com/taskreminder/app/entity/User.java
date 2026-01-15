@@ -1,4 +1,4 @@
-package com.taskreminder.app.Entity;
+package com.taskreminder.app.entity;
 
 import jakarta.persistence.*;
 
@@ -30,9 +30,15 @@ public class User {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "profile_image")
+    private String profileImage;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        if (this.profileImage == null) {
+            this.profileImage = "/images/profile.png";
+        }
     }
 
     public void clearOtp() {
@@ -86,6 +92,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public boolean isVerified() {

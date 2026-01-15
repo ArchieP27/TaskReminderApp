@@ -1,6 +1,6 @@
-package com.taskreminder.app.Repository;
+package com.taskreminder.app.repository;
 
-import com.taskreminder.app.Entity.User;
+import com.taskreminder.app.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

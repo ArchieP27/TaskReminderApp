@@ -70,7 +70,6 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .filter(Boolean);
 
-
     const calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: "dayGridMonth",
       height: "auto",

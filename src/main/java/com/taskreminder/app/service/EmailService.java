@@ -1,7 +1,7 @@
-package com.taskreminder.app.Service;
+package com.taskreminder.app.service;
 
-import com.taskreminder.app.Entity.Task;
-import com.taskreminder.app.Entity.User;
+import com.taskreminder.app.entity.Task;
+import com.taskreminder.app.entity.User;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;

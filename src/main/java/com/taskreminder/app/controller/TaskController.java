@@ -1,8 +1,8 @@
-package com.taskreminder.app.Controller;
+package com.taskreminder.app.controller;
 
-import com.taskreminder.app.Entity.Task;
-import com.taskreminder.app.Entity.User;
-import com.taskreminder.app.Service.TaskService;
+import com.taskreminder.app.entity.Task;
+import com.taskreminder.app.entity.User;
+import com.taskreminder.app.service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import jakarta.servlet.http.HttpSession;
@@ -90,7 +90,7 @@ public class TaskController {
             model.addAttribute("view", view);
             model.addAttribute("size", pageSize);
             model.addAttribute("userName", session.getAttribute("name"));
-            model.addAttribute("activePage", "dashboard");
+            model.addAttribute("activePage", "tasks");
             model.addAttribute("upcomingReminders", taskService.getUpcomingReminders(userId));
 
             return "tasks";
@@ -113,7 +113,7 @@ public class TaskController {
             model.addAttribute("priority", null);
             model.addAttribute("keyword", keyword);
             model.addAttribute("userName", session.getAttribute("name"));
-            model.addAttribute("activePage", "dashboard");
+            model.addAttribute("activePage", "tasks");
             return "tasks";
         }
 
@@ -134,7 +134,7 @@ public class TaskController {
                 allTasks.stream().filter(t -> t.getStatus() != TaskStatus.COMPLETED).toList());
         model.addAttribute("allTasks", allTasks);
         model.addAttribute("userName", session.getAttribute("name"));
-        model.addAttribute("activePage", "dashboard");
+        model.addAttribute("activePage", "tasks");
         model.addAttribute("upcomingReminders", taskService.getUpcomingReminders(userId));
 
         boolean noTasksAtAll = allTasks.isEmpty();

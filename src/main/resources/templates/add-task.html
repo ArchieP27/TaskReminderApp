@@ -93,7 +93,11 @@
                     th:field="*{reminderSent}"
                     onclick="toggleReminderTime(this)"
                   />
-                  <img src="/images/bell.png" alt="Reminder" class="bell-icon" />
+                  <img
+                    src="/images/bell.png"
+                    alt="Reminder"
+                    class="bell-icon"
+                  />
                   Send me a reminder
                 </label>
               </div>
@@ -146,36 +150,27 @@
 
     <div th:replace="~{fragments/footer :: footer}"></div>
     <script>
-      
       function updateReminderMax(dueDateValue) {
-    const reminderInput = document.getElementById('reminderTime');
-    if (dueDateValue) {
-        // Sets the maximum date the reminder can be
-        // We add 'T23:59' so they can set a reminder anytime on the actual due date
-        reminderInput.max = dueDateValue + "T23:59";
-        
-        // If current reminder is now invalid, clear it
-        if (reminderInput.value) {
-            const reminderDate = reminderInput.value.split('T')[0];
+        const reminderInput = document.getElementById("reminderTime");
+        if (dueDateValue) {
+          reminderInput.max = dueDateValue + "T23:59";
+          if (reminderInput.value) {
+            const reminderDate = reminderInput.value.split("T")[0];
             if (reminderDate > dueDateValue) {
-                alert("Reminder reset: It cannot be after the Due Date.");
-                reminderInput.value = "";
+              alert("Reminder reset: It cannot be after the Due Date.");
+              reminderInput.value = "";
             }
+          }
         }
-    }
-}
-
-// Run on page load to set initial constraint if editing a task
-window.onload = function() {
-    const dueDate = document.getElementById('dueDate').value;
-    if (dueDate) {
-        updateReminderMax(dueDate);
-    }
-    
-    // Your existing toggle logic
-    const checkbox = document.getElementById('sendReminder');
-    toggleReminderTime(checkbox);
-};
+      }
+      window.onload = function () {
+        const dueDate = document.getElementById("dueDate").value;
+        if (dueDate) {
+          updateReminderMax(dueDate);
+        }
+        const checkbox = document.getElementById("sendReminder");
+        toggleReminderTime(checkbox);
+      };
 
       function toggleReminderTime(checkbox) {
         const container = document.getElementById("reminderTimeContainer");
@@ -188,6 +183,15 @@ window.onload = function() {
         const checkbox = document.getElementById("sendReminder");
         toggleReminderTime(checkbox);
       };
+
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
     </script>
   </body>
 </html>

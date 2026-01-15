@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile | TimeIt</title>
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/profile.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+  </head>
+  <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <div class="profile-page">
+      <div class="profile-blob blob-one"></div>
+      <div class="profile-blob blob-two"></div>
+
+      <div class="profile-card-horizontal">
+        <div class="profile-sidebar">
+          <div class="sidebar-glass-shine"></div>
+          <div class="profile-image-wrapper">
+            <img
+              th:src="${user.profileImage}"
+              alt="Profile"
+              onerror="this.src='/images/profile.jpg'"
+            />
+            <div
+              th:if="${user.verified}"
+              class="verified-badge"
+              title="Verified Account"
+            >
+              ✓
+            </div>
+          </div>
+          <h2 class="profile-name" th:text="${user.name}"></h2>
+        </div>
+
+        <div class="profile-main">
+          <div class="main-glass-overlay"></div>
+
+          <div class="content-wrapper">
+            <div class="main-header">
+              <h3 class="section-title">User Information</h3>
+            </div>
+
+            <div class="profile-info-grid">
+              <div class="info-card">
+                <div class="card-glow"></div>
+                <label>Email Address</label>
+                <p th:text="${user.email}"></p>
+              </div>
+
+              <div class="info-card">
+                <div class="card-glow"></div>
+                <label>Joined On</label>
+                <p
+                  th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}"
+                ></p>
+              </div>
+
+              <div class="info-card wide">
+                <div class="card-glow"></div>
+                <label>Account Status</label>
+                <div class="status-indicator">
+                  <div th:if="${user.verified}" class="status-box verified">
+                    <span class="status-icon">🛡️</span>
+                    <div>
+                      <span class="status-label">Verified</span>
+                      <span class="status-desc">Your identity is secured.</span>
+                    </div>
+                  </div>
+                  <div th:unless="${user.verified}" class="status-box pending">
+                    <span class="status-icon">⏳</span>
+                    <div>
+                      <span class="status-label">Pending</span>
+                      <span class="status-desc"
+                        >Complete your verification.</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-footer">
+              <a th:href="@{/profile/edit}" class="profile-edit-btn">
+                <span>Edit Profile Settings</span>
+                <i class="arrow-icon">→</i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    </script>
+  </body>
+</html>

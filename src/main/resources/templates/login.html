@@ -60,12 +60,13 @@
             <a th:href="@{/auth/forgot-password}">Forgot Password?</a>
           </div>
 
-          <form th:action="@{/auth/login}" method="post">
+          <form th:action="@{/auth/login}" method="post" >
             <div class="input-group">
               <label>Email Address</label>
               <input
                 type="email"
                 name="email"
+                th:value="${loginRequest != null ? loginRequest.email : ''}"
                 placeholder="name@company.com"
                 required
               />
