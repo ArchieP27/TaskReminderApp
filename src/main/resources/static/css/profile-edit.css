@@ -66,7 +66,6 @@ body::-webkit-scrollbar {
   }
 }
 
-
 .profile-blob {
   position: absolute;
   filter: blur(80px);
@@ -131,12 +130,12 @@ body::-webkit-scrollbar {
 
 .sidebar-badge {
   background: rgba(255, 255, 255, 0.15);
-  padding: 5px 12px;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border-radius: 32px;
   font-size: 0.7rem;
   text-transform: uppercase;
   font-weight: 800;
-  width: 50%;
+  width: 30%;
   margin: 0px auto 15px;
 }
 
@@ -201,7 +200,8 @@ body::-webkit-scrollbar {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-text-muted);
+  color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.15) !important;
   text-decoration: none;
   font-weight: 700;
   font-size: 0.9rem;
@@ -209,13 +209,15 @@ body::-webkit-scrollbar {
   transition: all 0.2s ease;
   width: fit-content;
   padding: 8px 12px;
-  border-radius: 10px;
-  background: transparent;
+  border-radius: 32px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 .back-link:hover {
   color: var(--color-primary);
-  background: #f1f5ff;
+  background: #f1f5ff !important;
   transform: translateX(-3px);
 }
 
@@ -237,7 +239,7 @@ body::-webkit-scrollbar {
 
 .auth-form-scrollable {
   flex: 1;
-  padding: 40px;
+  padding: 10px 40px;
   overflow-y: auto;
   scrollbar-width: none;
 }

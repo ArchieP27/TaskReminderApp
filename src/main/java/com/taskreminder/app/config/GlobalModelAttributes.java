@@ -21,4 +21,9 @@ public class GlobalModelAttributes {
         return userService.getUserById(userId).orElse(null);
     }
 
+    @ModelAttribute("profileImageVersion")
+    public long profileImageVersion() {
+        return System.currentTimeMillis();
+    }
+
 }

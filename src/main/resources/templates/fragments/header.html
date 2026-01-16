@@ -50,7 +50,7 @@
 
       <a th:href="@{/profile}" class="profile-avatar" title="View Profile">
         <img
-          th:src="${user != null ? user.profileImage : '/images/profile.jpg'}"
+          th:src="${user != null ? user.profileImage + '?v=' + profileImageVersion : '/images/profile.jpg'}"
           alt="Profile"
         />
       </a>

@@ -1,7 +1,7 @@
-//package com.taskreminder.app.Controller;
+//package com.taskreminder.app.png.Controller;
 //
-//import com.taskreminder.app.Entity.Task;
-//import com.taskreminder.app.Service.TaskService;
+//import com.taskreminder.app.png.Entity.Task;
+//import com.taskreminder.app.png.Service.TaskService;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.Pageable;

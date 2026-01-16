@@ -103,7 +103,7 @@ public class ProfileController {
         try {
             userService.updateProfile(userId, dto);
             ra.addFlashAttribute("successMessage", "Profile updated successfully!");
-            return "redirect:/profile";
+            return "redirect:/profile/edit";
         } catch (RuntimeException ex) {
             ra.addFlashAttribute("errorMessage", ex.getMessage());
             ra.addFlashAttribute("profile", dto);

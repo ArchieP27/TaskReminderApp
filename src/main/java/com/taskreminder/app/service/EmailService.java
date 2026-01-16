@@ -98,12 +98,13 @@ public class EmailService {
                 "    <p>This is a reminder for your upcoming task:</p>" +
                 "    <ul>" +
                 "      <li><strong>Title:</strong> " + task.getTitle() + "</li>" +
-                "      <li><strong>Due At:</strong> " + dtf.format(task.getReminderTime()) + "</li>" +
+                "      <li><strong>Due At:</strong> " + dtf.format(task.getDueDate()) + "</li>" +
                 "      <li><strong>Description:</strong> " + task.getDescription() + "</li>" +
                 "    </ul>" +
                 "    <p style='font-size:12px; color:#777;'>Make sure to complete it on time!</p>" +
                 "  </div>" +
                 "</body>" +
+
                 "</html>";
     }
 }

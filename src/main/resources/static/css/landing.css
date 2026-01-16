@@ -20,8 +20,18 @@
   margin: 0;
   padding: 0;
 }
+
 html {
-  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+body {
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
 }
 
 body {

@@ -33,7 +33,7 @@
           <div class="sidebar-glass-shine"></div>
           <div class="profile-image-wrapper">
             <img
-              th:src="${user.profileImage}"
+              th:src="${user != null ? user.profileImage + '?v=' + profileImageVersion : '/images/profile.jpg'}"
               alt="Profile"
               onerror="this.src='/images/profile.jpg'"
             />
