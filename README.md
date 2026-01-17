@@ -1,42 +1,90 @@
-# 🗂️ TimeIt - A Task Reminder Application
+# 🗂️ TimeIt — Smart Task Reminder & Productivity App
 
+![Java](https://img.shields.io/badge/Java-17+-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-Enabled-success)
+![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
+![Thymeleaf](https://img.shields.io/badge/View-Thymeleaf-darkgreen)
+![Scheduler](https://img.shields.io/badge/Scheduler-Enabled-purple)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ## 📌 Description
 
-A simple and user-friendly **Task Management Web Application** built using **Spring Boot, Thymeleaf, and JavaScript**.
+**TimeIt** is a **full-featured Java Spring Boot task management and reminder web application** designed to help users organize tasks, track priorities, and never miss deadlines.
 
-The application allows users to **add, edit, delete, and view tasks** using multiple layouts including **Table View, Card View, and Calendar View**.
+The application supports **secure user authentication**, **background schedulers for email reminders**, and **advanced task search & filtering**, making it a complete, production-ready productivity solution.
 
 ---
 
 ## 📸 Screenshot
 
-![Task Manager Screenshot](screenshots/landing.png)
-![Task Manager Screenshot](screenshots/app.png)
+![Landing Page](screenshots/landing.png)
+![Home Page](screenshots/app.png)
 
 ---
 
 ## 🚀 Features
 
-- [x] Add new tasks
-- [x] Edit existing tasks
-- [x] Delete tasks
-- [x] View tasks in table format
-- [x] View tasks as cards
-- [x] Calendar view using FullCalendar
+- [x] Secure user authentication (Spring Security)
+- [x] OTP-based email verification & password reset
+- [x] Add, edit, delete tasks
+- [x] Task search and advanced filtering
 - [x] Priority-based color coding
-- [x] Success messages for add and edit actions
+- [x] Calendar view (FullCalendar)
+- [x] Automated email reminders using scheduler
+- [x] Success & error notifications
+- [x] Responsive UI
 
+---
+
+## 🏗️ Application Architecture
+
+```text
+   ┌──────────────┐
+   │   Browser    │
+   │ Thymeleaf UI │
+   └──────┬───────┘
+          ▼
+┌──────────────────────┐
+│ Spring MVC Controller│
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│    Service Layer     │
+│    Business Logic    │
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│   Repository Layer   │
+│   Spring Data JPA    │
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│    MySQL Database    │
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│   Spring Scheduler   │
+│   Email Reminders    │
+└─────────┬────────────┘
+          ▼
+┌──────────────────────┐
+│   SMTP Mail Server   │
+└──────────────────────┘
+```
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- Java
+- Java 17+
 - Spring Boot
 - Spring MVC
 - Spring Data JPA
+- Spring Security
 - Hibernate
+- Spring Scheduler
 
 ### Frontend
 - HTML5
@@ -45,21 +93,25 @@ The application allows users to **add, edit, delete, and view tasks** using mult
 - Thymeleaf
 
 ### Database
-- MySQL / H2
+- MySQL
+- H2 (for development/testing)
 
 ### Libraries & Tools
 - FullCalendar.js
+- JavaMailSender
 - Google Fonts
 - Flaticon
+- Maven
 
 ---
 
 ## 🔗 External References
 
+- [Spring Boot](https://spring.io/projects/spring-boot)
 - [FullCalendar](https://fullcalendar.io/)
+- [Thymeleaf](https://www.thymeleaf.org/)
 - [Google Fonts](https://fonts.google.com/)
 - [Flaticon](https://www.flaticon.com/)
-- [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 
 ---
 
@@ -69,8 +121,10 @@ The application allows users to **add, edit, delete, and view tasks** using mult
 app/
 ├── src/main/java
 │   └── com.taskreminder.app
+│       ├── config
 │       ├── controller
 │       ├── service
+│       ├── scheduler
 │       ├── dto
 │       ├── enums
 │       ├── repository
@@ -81,13 +135,19 @@ app/
 │   │   ├── css
 │   │   └── js
 │   └── templates
-        └── fragments
-            ├── header.html
-            └── footer.html
+│       └── fragments
+│       │    ├── header.html
+│       │    └── footer.html
 │       ├── index.html
+│       ├── dashboard.html
 │       ├── register.html
+│       ├── forgot-password.html
+│       ├── reset-password.html
 │       ├── login.html
+│       ├── verify-reset-otp.html
 │       ├── verify-otp.html
+│       ├── profile.html
+│       ├── profile-edit.html
 │       ├── tasks.html
 │       ├── add-task.html
 │       └── update-task.html
@@ -102,7 +162,7 @@ app/
 - Java JDK 17+
 - Maven
 - MySQL
-- IntelliJ IDE
+- IntelliJ IDEA
 
 ### Steps to run
 1. Clone the repository
@@ -122,27 +182,37 @@ mvn spring-boot:run
 ```
 5. Open in browser
 ```bash
-http://localhost:8080/api/tasks
+http://localhost:8080/
 ```
 
 ---
 
 ## Application Flow
-1. User adds a task
-2. Task is saved in the database
-3. Success message is displayed
-4. User edits a task
-5. Updated success message is shown
-6. Tasks appear in calendar view automatically
+1. User registers and verifies email via OTP 
+2. User logs in securely 
+3. User creates and manages tasks 
+4. Scheduler checks upcoming deadlines 
+5. Email reminders are sent automatically 
+6. Tasks update live in table & calendar views
 
 ---
 
 ## Future Enhancements
-- User authentication
-- Task reminders
-- Search and filter options
-- Mobile-friendly UI
-- Cloud deployment
+- Push notifications 
+- Recurring tasks 
+- Task sharing & collaboration 
+- Role-based access control 
+- Cloud deployment (AWS / Azure)
+- Mobile application
+
+---
+
+## 📄 Project Summary
+
+• Built a production-ready task reminder application using Spring Boot and Thymeleaf.  
+• Implemented secure authentication with Spring Security and OTP-based email verification.  
+• Designed a scheduler-driven email notification system for task reminders.  
+• Added advanced search, filtering, and calendar-based task visualization.
 
 ---
 

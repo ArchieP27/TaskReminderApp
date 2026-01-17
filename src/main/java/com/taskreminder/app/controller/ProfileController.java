@@ -5,13 +5,22 @@ import com.taskreminder.app.entity.User;
 import com.taskreminder.app.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 
 @Controller
@@ -173,5 +182,32 @@ public class ProfileController {
         }
 
         return "redirect:/profile/edit";
+    }
+
+    @GetMapping(
+            value = "/profile/image/{fileName}",
+            produces = {
+                    MediaType.IMAGE_PNG_VALUE,
+                    MediaType.IMAGE_JPEG_VALUE
+            }
+    )
+    public ResponseEntity<Resource> serveImage(@PathVariable String fileName) throws IOException {
+        Path imagePath = Paths.get("uploads/profile", fileName);
+        if (!Files.exists(imagePath)) {
+            return ResponseEntity.notFound().build();
+        }
+        Resource resource = new UrlResource(imagePath.toUri());
+        MediaType mediaType;
+        if (fileName.toLowerCase().endsWith(".png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg")) {
+            mediaType = MediaType.IMAGE_JPEG;
+        } else {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+        return ResponseEntity
+                .ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 }

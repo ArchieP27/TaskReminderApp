@@ -1,7 +1,7 @@
 package com.taskreminder.app.entity;
 
-import enums.TaskPriority;
-import enums.TaskStatus;
+import com.taskreminder.app.enums.TaskPriority;
+import com.taskreminder.app.enums.TaskStatus;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 

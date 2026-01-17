@@ -2,7 +2,7 @@ package com.taskreminder.app.service;
 
 import com.taskreminder.app.entity.Task;
 import com.taskreminder.app.repository.TaskRepository;
-import enums.TaskStatus;
+import com.taskreminder.app.enums.TaskStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

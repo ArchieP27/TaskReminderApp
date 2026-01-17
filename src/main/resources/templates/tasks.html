@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="/css/footer.css" />
     <script th:inline="javascript">
       /*<![CDATA[*/
-        let tasksData = [];
-        /*[# th:if="${view == 'calendar'}"]*/
-          tasksData = [[${tasks}]];
-        /*[/]*/
+      let tasksData = [];
+      /*[# th:if="${view == 'calendar'}"]*/
+      tasksData = /*[[${tasks}]]*/ [];
+      /*[/]*/
       /*]]>*/
     </script>
     <script src="/js/app.js" defer></script>
@@ -151,7 +151,7 @@
           <select name="status" id="status">
             <option value="">All</option>
             <option
-              th:each="s : ${T(enums.TaskStatus).values()}"
+              th:each="s : ${T(com.taskreminder.app.enums.TaskStatus).values()}"
               th:value="${s}"
               th:selected="${param.status == s.name()}"
               th:text="${s.label}"
@@ -163,7 +163,7 @@
           <select name="priority" id="priority">
             <option value="">All</option>
             <option
-              th:each="p : ${T(enums.TaskPriority).values()}"
+              th:each="p : ${T(com.taskreminder.app.enums.TaskPriority).values()}"
               th:value="${p}"
               th:selected="${param.priority == p.name()}"
               th:text="${p.label}"

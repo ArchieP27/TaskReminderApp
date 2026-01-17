@@ -1,4 +1,4 @@
-package enums;
+package com.taskreminder.app.enums;
 
 public enum TaskStatus {
 

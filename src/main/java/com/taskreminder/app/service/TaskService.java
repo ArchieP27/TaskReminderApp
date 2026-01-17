@@ -2,10 +2,11 @@ package com.taskreminder.app.service;
 
 import com.taskreminder.app.entity.Task;
 import com.taskreminder.app.repository.TaskRepository;
-import enums.TaskPriority;
-import enums.TaskStatus;
+import com.taskreminder.app.enums.TaskPriority;
+import com.taskreminder.app.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -123,6 +124,62 @@ public class TaskService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime future = now.plusHours(24);
         return taskRepository.findUpcomingRemindersForUser(userId, now, future);
+    }
+
+    public List<Task> getRecentTasks(Integer userId, int limit) {
+        return taskRepository.findByUser_Id(userId)
+                .stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(limit)
+                .toList();
+    }
+
+    public List<Task> getHighPriorityTasks(Integer userId) {
+        return taskRepository
+                .findByUser_IdAndPriority(
+                        userId,
+                        TaskPriority.HIGH,
+                        PageRequest.of(0, 10)
+                )
+                .getContent();
+    }
+
+    public List<Task> getMediumPriorityTasks(Integer userId) {
+        return taskRepository
+                .findByUser_IdAndPriority(
+                        userId,
+                        TaskPriority.MEDIUM,
+                        PageRequest.of(0, 10)
+                )
+                .getContent();
+    }
+
+    public List<Task> getLowPriorityTasks(Integer userId) {
+        return taskRepository
+                .findByUser_IdAndPriority(
+                        userId,
+                        TaskPriority.LOW,
+                        PageRequest.of(0, 10)
+                )
+                .getContent();
+    }
+
+    public List<Task> getCompletedTasks(Integer userId) {
+        return taskRepository
+                .findByUser_IdAndStatus(
+                        userId,
+                        TaskStatus.COMPLETED,
+                        PageRequest.of(0, 20)
+                )
+                .getContent();
+    }
+
+    public List<Task> getPendingTasks(Integer userId) {
+        return taskRepository.findByUser_IdAndStatus(userId, TaskStatus.PENDING);
+    }
+
+    public List<Task> getInProgressTasks(Integer userId) {
+        return taskRepository.findByUser_IdAndStatus(userId, TaskStatus.IN_PROGRESS);
     }
 
 }

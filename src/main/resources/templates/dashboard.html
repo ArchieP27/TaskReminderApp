@@ -4,37 +4,183 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | TimeIt</title>
+
     <link rel="icon" type="image/png" href="/images/logo.png" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/footer.css" />
   </head>
+
   <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <div id="popup" th:if="${errorMessage}" class="popup-error">
-      <span th:text="${errorMessage}"></span>
-    </div>
+    <main class="dashboard-container">
+      <header class="dashboard-header">
+        <div class="header-inner">
+          <div class="welcome-group">
+            <div class="text-content">
+              <div class="header-badge">✨ Dashboard Overview</div>
+              <h2 class="dashboard-title">
+                Skyrocket your <span class="accent-text">Productivity</span>
+              </h2>
+              <p class="catchy-sub">
+                You have a busy day ahead. <strong>Let's make it count!</strong>
+              </p>
+            </div>
 
-    <div
-      th:if="${successMessage}"
-      class="popup-success"
-      style="margin-bottom: 15px"
-    >
-      <span th:text="${successMessage}"></span>
+            <img src="/images/rocket.png" alt="Rocket" class="rocket-img" />
+          </div>
+
+          <div class="header-stats-group">
+            <div class="status-glass">
+              <div class="status-header">
+                <span class="status-value" id="completionRate">0%</span>
+                <span class="status-label">Tasks Completed</span>
+              </div>
+
+              <div class="tech-bar">
+                <div class="tech-fill" style="width: 60%">
+                  <div class="fill-glow"></div>
+                </div>
+                <div class="bar-markers">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="total-tasks-calendar">
+              <div class="cal-top">Total</div>
+              <div class="cal-body">
+                <span class="cal-count stat-number" data-key="totalCount"
+                  >0</span
+                >
+                <span class="cal-unit">Tasks</span>
+              </div>
+              <div class="cal-dots"><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="bento-grid">
+        <section class="grid-item deadlines-wide">
+          <div class="section-header">
+            <img src="/images/calendar.png" class="section-icon" />
+            <h3 class="accent-text">Urgent Deadlines</h3>
+          </div>
+          <div class="deadlines-inner">
+            <div class="stat-card overdue" data-type="overdue">
+              <div class="card-left">
+                <span class="stat-label">Overdue</span>
+                <p class="stat-number" data-key="overdueCount">0</p>
+              </div>
+              <img src="/images/overdue.png" class="card-icon" />
+            </div>
+            <div class="stat-card today" data-type="today">
+              <div class="card-left">
+                <span class="stat-label">Due Today</span>
+                <p class="stat-number" data-key="dueTodayTasks">0</p>
+              </div>
+              <img src="/images/today.png" class="card-icon" />
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-item status-box">
+          <div class="section-header">
+            <img src="/images/tasks.png" class="section-icon" />
+            <h3 class="accent-text">Task Status</h3>
+          </div>
+          <div class="status-split-grid">
+            <div class="stat-card pending" data-type="pending">
+              <div class="card-left">
+                <span class="stat-label">Pending</span>
+                <p class="stat-number" data-key="pendingCount">0</p>
+              </div>
+              <img src="/images/pending.png" class="card-icon" />
+            </div>
+            <div class="stat-card inprogress" data-type="inprogress">
+              <div class="card-left">
+                <span class="stat-label">Active</span>
+                <p class="stat-number" data-key="inProgressCount">0</p>
+              </div>
+              <img src="/images/inprogress.png" class="card-icon" />
+            </div>
+            <div class="stat-card completed full-width" data-type="completed">
+              <div class="card-left">
+                <span class="stat-label">Completed</span>
+                <p class="stat-number" data-key="completedCount">0</p>
+              </div>
+              <img src="/images/completed.png" class="card-icon" />
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-item priority-box">
+          <div class="section-header">
+            <img src="/images/priority.png" class="section-icon" />
+            <h3 class="accent-text">Priority Focus</h3>
+          </div>
+
+          <div class="priority-vertical-stack">
+            <div class="stat-card high" data-type="high">
+              <div class="card-left">
+                <span class="stat-label">High</span>
+                <p class="stat-number" data-key="highPriorityTasks">0</p>
+              </div>
+              <div class="priority-indicator">▲</div>
+            </div>
+
+            <div class="stat-card medium" data-type="medium">
+              <div class="card-left">
+                <span class="stat-label">Medium</span>
+                <p class="stat-number" data-key="mediumPriorityTasks">0</p>
+              </div>
+              <div class="priority-indicator">●</div>
+            </div>
+
+            <div class="stat-card low" data-type="low">
+              <div class="card-left">
+                <span class="stat-label">Low</span>
+                <p class="stat-number" data-key="lowPriorityTasks">0</p>
+              </div>
+              <div class="priority-indicator">▼</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="grid-item recent-tasks-box">
+        <div class="section-header">
+          <img src="/images/recent.png" class="section-icon" />
+          <h3 class="accent-text">Recent Tasks</h3>
+        </div>
+        <div class="table-wrapper">
+          <table class="recent-table">
+            <thead>
+              <tr>
+                <th>Task Name</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Deadline</th>
+              </tr>
+            </thead>
+            <tbody id="recentTasksTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="modalOverlay" class="modal-overlay">
+      <div class="modal-box">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <ul id="tasks-list" class="modal-list"></ul>
+      </div>
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
 
-  <script>
-      function updateClock() {
-        const now = new Date();
-        const time = now.toLocaleTimeString();
-        document.getElementById("liveClock").textContent = time;
-      }
-
-      updateClock();
-      setInterval(updateClock, 1000);
-  </script>
+    <script src="/js/dashboard.js"></script>
   </body>
 </html>

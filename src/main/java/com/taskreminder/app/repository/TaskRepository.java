@@ -1,8 +1,8 @@
 package com.taskreminder.app.repository;
 
 import com.taskreminder.app.entity.Task;
-import enums.TaskPriority;
-import enums.TaskStatus;
+import com.taskreminder.app.enums.TaskPriority;
+import com.taskreminder.app.enums.TaskStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +21,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     Page<Task> findByUser_Id(Integer userId, Pageable pageable);
 
     Page<Task> findByUser_IdAndStatus(Integer userId, TaskStatus status, Pageable pageable);
+    List<Task> findByUser_IdAndStatus(Integer userId, TaskStatus status);
 
     Page<Task> findByUser_IdAndPriority(Integer userId, TaskPriority priority, Pageable pageable);
 

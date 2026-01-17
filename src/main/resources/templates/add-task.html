@@ -120,7 +120,7 @@
                   <label for="priority">Priority</label>
                   <select th:field="*{priority}" id="priority">
                     <option
-                      th:each="p : ${T(enums.TaskPriority).values()}"
+                      th:each="p : ${T(com.taskreminder.app.enums.TaskPriority).values()}"
                       th:value="${p}"
                       th:text="${p.label}"
                     ></option>
@@ -131,7 +131,7 @@
                   <label for="status">Status</label>
                   <select th:field="*{status}" id="status">
                     <option
-                      th:each="s : ${T(enums.TaskStatus).values()}"
+                      th:each="s : ${T(com.taskreminder.app.enums.TaskStatus).values()}"
                       th:value="${s}"
                       th:text="${s.label}"
                     ></option>

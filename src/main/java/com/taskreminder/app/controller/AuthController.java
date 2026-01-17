@@ -119,7 +119,7 @@ public class AuthController {
         String response = userService.loginUser(email, password, session);
 
         if (response.equalsIgnoreCase("Login successful")) {
-            return "redirect:/api/tasks";
+            return "redirect:/api/dashboard";
         }
 
         redirectAttributes.addFlashAttribute("errorMessage", response);
