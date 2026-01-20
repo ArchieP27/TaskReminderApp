@@ -2,12 +2,18 @@ package com.taskreminder.app.service;
 
 import com.taskreminder.app.entity.Task;
 import com.taskreminder.app.entity.User;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
@@ -26,7 +32,12 @@ public class EmailService {
     @Value("${spring.mail.password}")
     private String password;
 
-    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+    private static final DateTimeFormatter DATE_TIME_FMT =
+            DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+
 
     public void sendEmail(String to, String subject, String body) {
         Properties props = new Properties();
@@ -98,7 +109,7 @@ public class EmailService {
                 "    <p>This is a reminder for your upcoming task:</p>" +
                 "    <ul>" +
                 "      <li><strong>Title:</strong> " + task.getTitle() + "</li>" +
-                "      <li><strong>Due At:</strong> " + dtf.format(task.getDueDate()) + "</li>" +
+                "      <li><strong>Due At:</strong> " + task.getDueDate().format(DATE_FMT) + "</li>" +
                 "      <li><strong>Description:</strong> " + task.getDescription() + "</li>" +
                 "    </ul>" +
                 "    <p style='font-size:12px; color:#777;'>Make sure to complete it on time!</p>" +
@@ -107,4 +118,45 @@ public class EmailService {
 
                 "</html>";
     }
+
+
+    public void sendCsvAttachmentEmail(String to, String subject, String body, String csvData) {
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", String.valueOf(port));
+
+        Session session = Session.getInstance(props, getPasswordAuthentication());
+
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(subject);
+
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setContent(body, "text/html; charset=utf-8");
+
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            DataSource source = new ByteArrayDataSource(csvData, "text/csv");
+            attachmentPart.setDataHandler(new DataHandler(source));
+            attachmentPart.setFileName("tasks.csv");
+
+            MimeMultipart multipart = new MimeMultipart();
+            multipart.addBodyPart(textPart);
+            multipart.addBodyPart(attachmentPart);
+
+            message.setContent(multipart);
+
+            Transport.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send CSV email", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

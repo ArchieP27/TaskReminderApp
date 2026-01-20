@@ -49,7 +49,9 @@
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 99999;
-  animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+  animation:
+    slideIn 0.3s ease,
+    fadeOut 0.5s ease 3s forwards;
 }
 
 .popup-success {
@@ -63,7 +65,9 @@
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 99999;
-  animation: slideIn 0.3s ease, fadeOut 0.5s ease 3s forwards;
+  animation:
+    slideIn 0.3s ease,
+    fadeOut 0.5s ease 3s forwards;
 }
 
 @keyframes slideIn {
@@ -200,7 +204,9 @@ h1 {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   z-index: 1001;
 }
 
@@ -323,7 +329,9 @@ form select {
   padding: 10px 15px;
   border: 1px solid #ced4da;
   border-radius: 10px;
-  transition: all 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    all 0.3s ease,
+    box-shadow 0.3s ease;
   width: 100%;
   box-sizing: border-box;
   background-color: var(--color-surface);
@@ -400,6 +408,110 @@ form input[type="submit"],
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
 
+.tasks-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  background-color: #e6f4ea;
+  padding: 10px 10px;
+  border-radius: 10px;
+}
+
+.export-icon-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px !important;
+  padding: 0 12px;
+  background-color: #16a34a;
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.export-icon-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.export-icon-btn:hover {
+  background-color: #138a3a;
+  transform: translateY(-1px);
+}
+
+.export-select {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #16a34a;
+  background-color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-select:focus {
+  outline: none;
+  border-color: #138a3a;
+  box-shadow: 0 0 5px rgba(22, 163, 74, 0.4);
+}
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-toggle .view-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #16a34a;
+  background-color: #ffffff;
+  color: #16a34a;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle .view-btn.active {
+  background-color: #16a34a;
+  color: white;
+}
+
+.view-toggle .view-btn:hover:not(.active) {
+  background-color: #d1f0d7;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .tasks-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .export-form {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .view-toggle {
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+}
+
 .view-toggle {
   text-align: right;
   margin-bottom: 30px;
@@ -415,7 +527,9 @@ form input[type="submit"],
   border: 1px solid #e0e0e0;
   background-color: var(--color-surface);
   color: var(--color-text-dark);
-  transition: all 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    all 0.3s ease,
+    box-shadow 0.3s ease;
   cursor: pointer;
 }
 
@@ -443,7 +557,6 @@ form input[type="submit"],
   display: table;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 25px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   overflow: hidden;
@@ -471,7 +584,9 @@ form input[type="submit"],
 }
 
 .table tr {
-  transition: background-color 0.2s ease, box-shadow 0.2s ease,
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
     transform 0.2s ease;
 }
 
@@ -481,7 +596,8 @@ form input[type="submit"],
 
 .table tr:hover {
   background-color: #f0f3f6;
-  box-shadow: inset 5px 0 0 0 var(--color-primary),
+  box-shadow:
+    inset 5px 0 0 0 var(--color-primary),
     0 5px 15px rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
 }
@@ -1173,7 +1289,9 @@ form input[type="submit"],
   padding: 15px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .stat-card:hover {

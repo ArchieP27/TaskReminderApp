@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -211,9 +211,22 @@
         />
       </form>
 
-      <div class="view-toggle">
-        <a
-          th:href="@{/api/tasks(
+      <div class="tasks-toolbar">
+        <form action="/api/tasks/export" method="post" class="export-form">
+          <button type="submit" class="export-icon-btn" title="Export Tasks">
+            <img src="/images/csv.png" alt="Export" />
+            Export CSV
+          </button>
+
+          <select name="action" class="export-select">
+            <option value="">-- Select --</option>
+            <option value="download">Download CSV</option>
+            <option value="email">Email CSV</option>
+          </select>
+        </form>
+        <div class="view-toggle">
+          <a
+            th:href="@{/api/tasks(
         page=0,
         size=${size},
         keyword=${param.keyword},
@@ -222,14 +235,14 @@
         sort=${param.sort},
         view='table'
 )}"
-          id="tableViewBtn"
-          th:classappend="${view == 'table'} ? 'active'"
-          class="view-btn"
-          >Table View</a
-        >
+            id="tableViewBtn"
+            th:classappend="${view == 'table'} ? 'active'"
+            class="view-btn"
+            >Table View</a
+          >
 
-        <a
-          th:href="@{/api/tasks(
+          <a
+            th:href="@{/api/tasks(
         page=0,
         size=${size},
         keyword=${param.keyword},
@@ -238,21 +251,22 @@
         sort=${param.sort},
         view='card'
 )}"
-          id="cardViewBtn"
-          th:classappend="${view == 'card'} ? 'active'"
-          class="view-btn"
-          >Card View</a
-        >
+            id="cardViewBtn"
+            th:classappend="${view == 'card'} ? 'active'"
+            class="view-btn"
+            >Card View</a
+          >
 
-        <a
-          th:href="@{/api/tasks(
+          <a
+            th:href="@{/api/tasks(
         view='calendar'
 )}"
-          id="calendarViewBtn"
-          th:classappend="${view == 'calendar'} ? 'active'"
-          class="view-btn"
-          >Calendar View</a
-        >
+            id="calendarViewBtn"
+            th:classappend="${view == 'calendar'} ? 'active'"
+            class="view-btn"
+            >Calendar View</a
+          >
+        </div>
       </div>
 
       <table id="tableView" th:if="${view=='table'}" class="table">
@@ -337,7 +351,11 @@
                 <a
                   th:href="@{|/api/tasks/delete/${task.id}|}"
                   class="action-link action-delete"
-                  onclick="return confirm('Are you sure you want to delete this task?');"
+                  onclick="
+                    return confirm(
+                      'Are you sure you want to delete this task?',
+                    );
+                  "
                 >
                   <img
                     th:src="@{/images/trash-2.png}"
@@ -437,7 +455,9 @@
             <a
               th:href="@{|/api/tasks/delete/${task.id}|}"
               class="action-link action-delete"
-              onclick="return confirm('Are you sure you want to delete this task?');"
+              onclick="
+                return confirm('Are you sure you want to delete this task?');
+              "
             >
               <img
                 th:src="@{/images/trash-2.png}"
@@ -569,7 +589,7 @@
         reminderTooltip.classList.add("tooltip-show");
         setTimeout(
           () => reminderTooltip.classList.remove("tooltip-show"),
-          1500
+          1500,
         );
       });
 

@@ -2,9 +2,12 @@ package com.taskreminder.app.controller;
 
 import com.taskreminder.app.entity.Task;
 import com.taskreminder.app.entity.User;
+import com.taskreminder.app.service.EmailService;
 import com.taskreminder.app.service.TaskService;
 import com.taskreminder.app.enums.TaskPriority;
 import com.taskreminder.app.enums.TaskStatus;
+import com.taskreminder.app.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,8 +20,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/tasks")
@@ -26,6 +32,12 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public String listTasks(
@@ -490,6 +502,143 @@ public class TaskController {
             ra.addFlashAttribute("errorMessage", "Failed to mark task as completed. Please try again.");
             return "redirect:/api/tasks";
         }
+    }
+
+    @PostMapping("/export")
+    public String exportTasks(
+            @RequestParam("action") String action,
+            HttpServletResponse response,
+            HttpSession session,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        if (action == null || action.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please select an action to export: Download or Email.");
+            return "redirect:/api/tasks";
+        }
+
+        List<Task> tasks = taskService.getAllTasksByUser(userId);
+
+        if (tasks.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You don’t have any tasks to export yet.");
+            return "redirect:/api/tasks";
+        }
+
+        if ("download".equals(action)) {
+            exportCsvDownload(response, tasks);
+            redirectAttributes.addFlashAttribute("successMessage", "File downloaded successfully!");
+            return null; // the response already returns the CSV
+        } else if ("email".equals(action)) {
+            exportCsvEmail(tasks, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "File emailed successfully!");
+            return "redirect:/api/tasks";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid export action selected.");
+            return "redirect:/api/tasks";
+        }
+    }
+
+    private void exportCsvDownload(HttpServletResponse response, List<Task> tasks) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=tasks.csv");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("ID,Title,Description,Status,Priority,Due Date,Created At,Completed At");
+
+        for (Task task : tasks) {
+            writer.println(
+                    task.getId() + "," +
+                            csvEscape(task.getTitle()) + "," +
+                            csvEscape(task.getDescription()) + "," +
+                            task.getStatus() + "," +
+                            task.getPriority() + "," +
+                            task.getDueDate() + "," +
+                            task.getCreatedAt() + "," +
+                            task.getCompletedAt()
+            );
+        }
+        writer.flush();
+    }
+
+    private void exportCsvEmail(List<Task> tasks, Integer userId) throws IOException {
+
+        StringBuilder csv = new StringBuilder();
+        csv.append("ID,Title,Description,Status,Priority,Due Date,Created At,Completed At\n");
+
+        for (Task task : tasks) {
+            csv.append(
+                            task.getId()).append(",")
+                    .append(csvEscape(task.getTitle())).append(",")
+                    .append(csvEscape(task.getDescription())).append(",")
+                    .append(task.getStatus()).append(",")
+                    .append(task.getPriority()).append(",")
+                    .append(task.getDueDate()).append(",")
+                    .append(task.getCreatedAt()).append(",")
+                    .append(task.getCompletedAt()).append("\n");
+        }
+
+        String email = userService.getEmailByUserId(userId);
+
+        Optional<User> optionalUser = userService.getUserById(userId);
+
+        if (optionalUser.isEmpty()) {
+            return;
+        }
+
+        User user = optionalUser.get();
+        String body = buildExportCsvHtml(user.getName())
+                .replace("${TASK_COUNT}", String.valueOf(tasks.size()))
+                .replace("${CURRENT_DATE}", LocalDate.now().toString());
+
+        emailService.sendCsvAttachmentEmail(
+                email,
+                "Your Tasks Export - TimeIt",
+                body,
+                csv.toString()
+        );
+    }
+
+    private String buildExportCsvHtml(String userName) {
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<body style='font-family: Arial, sans-serif; background-color:#f4f4f4; padding:20px;'>" +
+                "  <div style='max-width:600px; margin:auto; background:#ffffff; padding:30px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>" +
+                "    <h2 style='color:#16a34a; margin-bottom:10px;'>Your Task Export 📄</h2>" +
+                "    <p>Hi <strong>" + userName + "</strong>,</p>" +
+                "    <p>We've prepared your task list in CSV format. You can find it attached to this email.</p>" +
+                "    <ul style='background:#e6f4ea; padding:15px; border-radius:6px;'>" +
+                "      <li><strong>Export Type:</strong> CSV File</li>" +
+                "      <li><strong>Total Tasks:</strong> ${TASK_COUNT}</li>" +
+                "      <li><strong>Date:</strong> ${CURRENT_DATE}</li>" +
+                "    </ul>" +
+                "    <p style='margin-top:15px;'>Feel free to open it in Excel or any spreadsheet tool to manage your tasks.</p>" +
+                "    <p style='margin-top:20px; font-size:14px; color:#555;'>– The <strong>TimeIt</strong> Team</p>" +
+                "    <hr style='border:none; border-top:1px solid #eee; margin:20px 0;' />" +
+                "    <p style='font-size:12px; color:#777;'>This is an automated email, please do not reply.</p>" +
+                "  </div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private String csvEscape(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        boolean hasSpecialChar =
+                value.contains(",") ||
+                        value.contains("\"") ||
+                        value.contains("\n") ||
+                        value.contains("\r");
+
+        String escaped = value.replace("\"", "\"\"");
+
+        return hasSpecialChar ? "\"" + escaped + "\"" : escaped;
     }
 
 }

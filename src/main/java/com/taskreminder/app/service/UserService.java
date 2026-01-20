@@ -409,4 +409,10 @@ public class UserService {
         }
         userRepository.save(user);
     }
+
+    public String getEmailByUserId(Integer userId) {
+        return userRepository.findEmailByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User email not found"));
+    }
+
 }
