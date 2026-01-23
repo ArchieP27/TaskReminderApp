@@ -455,13 +455,9 @@ public class TaskController {
                 return "redirect:/api/tasks";
             }
 
-            if (task.getStatus() == TaskStatus.COMPLETED) {
-                ra.addFlashAttribute("errorMessage", "Completed tasks cannot be deleted.");
-                return "redirect:/api/tasks";
-            }
 
-            taskService.deleteTask(id, userId);
-            ra.addFlashAttribute("successMessage", "Task deleted successfully!");
+            taskService.moveToTrash(id, userId);
+            ra.addFlashAttribute("successMessage", "Task moved to Trash!");
             return "redirect:/api/tasks";
 
         } catch (Exception e) {
@@ -469,6 +465,64 @@ public class TaskController {
             return "redirect:/api/tasks";
         }
     }
+
+    @GetMapping("/trash")
+    public String viewTrash(Model model, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) return "redirect:/auth/login";
+
+        List<Task> trashedTasks = taskService.getTrashedTasks(userId);
+
+        model.addAttribute("tasks", trashedTasks);
+        model.addAttribute("userName", session.getAttribute("name"));
+        model.addAttribute("activePage", "trash");
+
+        if (trashedTasks.isEmpty()) {
+            model.addAttribute("errorMessage", "Trash is empty.");
+        }
+
+        return "trash";
+    }
+
+    @GetMapping("/restore/{id}")
+
+    public String restoreTask(@PathVariable Integer id, HttpSession session, RedirectAttributes ra) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) return "redirect:/auth/login";
+
+        taskService.restoreTask(id, userId);
+        ra.addFlashAttribute("successMessage","Task Restored Successfully!");
+        return "redirect:/api/tasks/trash";
+    }
+
+    @GetMapping("/permanent-delete/{id}")
+    public String permanentDelete(@PathVariable Integer id, HttpSession session, RedirectAttributes ra) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) return "redirect:/auth/login";
+
+        taskService.permanentDelete(id, userId);
+        ra.addFlashAttribute("successMessage","Task Deleted Successfully!");
+        return "redirect:/api/tasks/trash";
+    }
+
+    @GetMapping("/empty-trash")
+    public String emptyTrash(HttpSession session, RedirectAttributes ra) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/auth/login";
+        }
+
+        try {
+            taskService.emptyTrash(userId);
+            ra.addFlashAttribute("successMessage", "Trash emptied successfully!");
+        } catch (RuntimeException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/api/tasks/trash";
+    }
+
 
     @GetMapping("/markAsDone/{id}")
     public String markAsDone(
@@ -532,7 +586,7 @@ public class TaskController {
         if ("download".equals(action)) {
             exportCsvDownload(response, tasks);
             redirectAttributes.addFlashAttribute("successMessage", "File downloaded successfully!");
-            return null; // the response already returns the CSV
+            return null;
         } else if ("email".equals(action)) {
             exportCsvEmail(tasks, userId);
             redirectAttributes.addFlashAttribute("successMessage", "File emailed successfully!");

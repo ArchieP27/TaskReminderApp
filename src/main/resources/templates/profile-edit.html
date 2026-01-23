@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
@@ -40,11 +40,9 @@
           <a href="/profile" class="back-link">
             <span class="back-arrow">←</span> Back to Profile
           </a>
-
         </div>
 
         <div class="auth-form-scrollable">
-
           <div class="form-title">Edit Profile</div>
 
           <form
@@ -63,9 +61,14 @@
                   alt="Profile Image"
                   id="previewImage"
                 />
-
-                <div class="edit-overlay"><span>✏️ Change</span></div>
+                <div class="edit-overlay">
+                  <span class="change-btn">✏️ Change</span>
+                  <span class="delete-btn" onclick="deleteProfileImage(event)"
+                    >🗑️ Delete</span
+                  >
+                </div>
               </label>
+
               <input
                 type="file"
                 name="profileImage"
@@ -204,6 +207,22 @@
 
     <script>
       const form = document.getElementById("profileForm");
+
+      function deleteProfileImage(event) {
+        event.stopPropagation();
+
+        if (!confirm("Remove profile picture?")) return;
+
+        fetch("/profile/delete-image", {
+          method: "POST",
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error();
+            const img = document.getElementById("previewImage");
+            img.src = "/images/profile.png?v=" + new Date().getTime();
+          })
+          .catch(() => alert("Failed to delete profile image"));
+      }
 
       function validateAndPreviewImage() {
         const fileInput = document.getElementById("fileInput");

@@ -180,11 +180,34 @@ body::-webkit-scrollbar {
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: 0.3s;
+  flex-direction: column;
 }
+
+.change-btn {
+  color: #62e8a3;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.change-btn:hover {
+  text-decoration: underline;
+}
+
+.delete-btn {
+  color: #ff4d4d;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.delete-btn:hover {
+  text-decoration: underline;
+}
+
 .profile-image-wrapper:hover .edit-overlay {
   opacity: 1;
 }

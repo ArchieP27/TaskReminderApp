@@ -410,6 +410,29 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void deleteProfileImage(Integer userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String currentImage = user.getProfileImage();
+
+        if (currentImage == null || currentImage.equals("/images/profile.png")) {
+            return;
+        }
+        Path filePath = Paths.get(currentImage.substring(1));
+
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete profile image");
+        }
+
+        user.setProfileImage("/images/profile.png");
+        userRepository.save(user);
+    }
+
+
     public String getEmailByUserId(Integer userId) {
         return userRepository.findEmailByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("User email not found"));

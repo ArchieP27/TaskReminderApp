@@ -216,5 +216,10 @@ http://localhost:8080/
 
 ---
 
+## Attribution
+
+- See [CREDITS.md](CREDITS.md) for icon attributions.
+
+---
 ## Author
 ### Archita Porov

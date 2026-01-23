@@ -212,18 +212,24 @@
       </form>
 
       <div class="tasks-toolbar">
-        <form action="/api/tasks/export" method="post" class="export-form">
-          <button type="submit" class="export-icon-btn" title="Export Tasks">
-            <img src="/images/csv.png" alt="Export" />
-            Export CSV
-          </button>
+        <div class="left-tool">
+          <a href="/api/tasks/trash" class="trash-btn" title="Trash">
+            <img src="/images/rdel.png" class="icon" />
+             Trash
+          </a>
+          <form action="/api/tasks/export" method="post" class="export-form">
+            <button type="submit" class="export-icon-btn" title="Export Tasks">
+              <img src="/images/csv.png" alt="Export" />
+              Export CSV
+            </button>
 
-          <select name="action" class="export-select">
-            <option value="">-- Select --</option>
-            <option value="download">Download CSV</option>
-            <option value="email">Email CSV</option>
-          </select>
-        </form>
+            <select name="action" class="export-select">
+              <option value="">-- Select --</option>
+              <option value="download">Download CSV</option>
+              <option value="email">Email CSV</option>
+            </select>
+          </form>
+        </div>
         <div class="view-toggle">
           <a
             th:href="@{/api/tasks(

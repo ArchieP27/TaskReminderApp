@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recently Deleted Tasks | TimeIt</title>
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/trash.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+  </head>
+
+  <body>
+    <div id="popup" th:if="${errorMessage}" class="popup-error">
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div
+      th:if="${successMessage}"
+      class="popup-success"
+      style="margin-bottom: 15px"
+    >
+      <span th:text="${successMessage}"></span>
+    </div>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="trash-container">
+      <div class="trash-header">
+        <h1>Recently Deleted Tasks</h1>
+        <a
+          th:href="@{/api/tasks/empty-trash}"
+          class="trash-btn"
+          onclick="
+            return confirm(
+              'This will permanently delete all tasks in Trash. Continue?',
+            );
+          "
+        >
+          <img src="/images/rdel.png" alt="Trash" /> Empty Trash
+        </a>
+      </div>
+
+      <div th:if="${tasks != null and !tasks.isEmpty()}">
+        <table class="trash-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Deleted At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="task : ${tasks}">
+              <td th:text="${task.title}"></td>
+              <td th:text="${task.description}"></td>
+              <td>
+                <span
+                  class="priority-badge camel-case"
+                  th:text="${task.priority}"
+                ></span>
+              </td>
+              <td th:text="${task.dueDate}"></td>
+              <td
+                th:text="${#temporals.format(task.deletedAt, 'dd MMM yyyy, hh:mm a')}"
+              ></td>
+              <td class="action-cell">
+                <a th:href="@{/api/tasks/restore/{id}(id=${task.id})}">
+                  <button class="action-btn restore-btn">
+                    <img src="/images/restore-icon.png" alt="Restore" /> Restore
+                  </button>
+                </a>
+                <a
+                  th:href="@{/api/tasks/permanent-delete/{id}(id=${task.id})}"
+                  onclick="
+                    return confirm(
+                      'Are you sure you want to permanently delete this task?',
+                    );
+                  "
+                >
+                  <button class="action-btn delete-btn">
+                    <img src="/images/delete-icon.png" alt="Delete" /> Delete
+                  </button>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div th:if="${tasks == null or tasks.isEmpty()}" class="no-tasks">
+        Your Trash is empty. Deleted tasks will appear here.
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        document.getElementById("liveClock").textContent = time;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    </script>
+  </body>
+</html>

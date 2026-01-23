@@ -97,7 +97,7 @@ public class TaskRestController {
             HttpSession session
     ) {
         Integer userId = (Integer) session.getAttribute("userId");
-        taskService.deleteTask(id, userId);
+        taskService.moveToTrash(id,userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -124,6 +124,46 @@ public class TaskRestController {
     ) {
         Integer userId = (Integer) session.getAttribute("userId");
         return ResponseEntity.ok(taskService.getUpcomingTasks(userId, days));
+    }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<Void> restoreTask(
+            @PathVariable Integer id,
+            HttpSession session
+    ) {
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        taskService.restoreTask(id, userId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/permanent-delete/{id}")
+    public ResponseEntity<Void> permanentDelete(
+            @PathVariable Integer id,
+            HttpSession session
+    ) {
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        taskService.permanentDelete(id, userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/trash")
+    public ResponseEntity<List<Task>> getTrashedTasks(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        return ResponseEntity.ok(taskService.getTrashedTasks(userId));
+    }
+
+    @DeleteMapping("/empty-trash")
+    public ResponseEntity<Void> emptyTrash(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        taskService.emptyTrash(userId);
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/overdue")

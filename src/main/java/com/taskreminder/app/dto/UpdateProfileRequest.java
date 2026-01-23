@@ -6,7 +6,6 @@ public class UpdateProfileRequest {
 
     private String name;
     private String email;
-
     private MultipartFile profileImage;
 
     public MultipartFile getProfileImage() {
@@ -32,4 +31,5 @@ public class UpdateProfileRequest {
     public void setEmail(String email) {
         this.email = email;
     }
+
 }

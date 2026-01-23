@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,9 @@ class TaskServiceTest {
 
     @InjectMocks
     private TaskService taskService;
+
+    @Mock
+    private UserService userService;
 
     @Test
     void testAddTaskSuccess() {
@@ -110,29 +114,114 @@ class TaskServiceTest {
     }
 
     @Test
-    void testDeleteTaskSuccess() {
+    void testMoveToTrashSuccess() {
         User user = new User();
         user.setId(1);
 
         Task task = new Task();
+        task.setId(3);
+        task.setUser(user);
+        task.setDeleted(false);
+
+        when(taskRepository.findByIdAndUserIdIncludingDeleted(3, 1))
+                .thenReturn(Optional.of(task));
+
+        taskService.moveToTrash(3, 1);
+
+        assertTrue(task.isDeleted());
+        assertNotNull(task.getDeletedAt());
+
+        verify(taskRepository).save(task);
+    }
+
+    @Test
+    void testMoveToTrashTaskNotFound() {
+        when(taskRepository.findByIdAndUserIdIncludingDeleted(10, 1))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> taskService.moveToTrash(10, 1)
+        );
+
+        verify(taskRepository, never()).save(any());
+    }
+
+    @Test
+    void testMoveToTrashAlreadyDeleted() {
+        User user = new User();
+        user.setId(1);
+
+        Task task = new Task();
+        task.setId(3);
+        task.setUser(user);
+        task.setDeleted(true);
+
+        when(taskRepository.findByIdAndUserIdIncludingDeleted(3, 1))
+                .thenReturn(Optional.of(task));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> taskService.moveToTrash(3, 1)
+        );
+
+        verify(taskRepository, never()).save(any());
+    }
+
+    @Test
+    void testRestoreTaskSuccess() {
+        User user = new User();
+        user.setId(1);
+
+        Task task = new Task();
+        task.setId(3);
+        task.setDeleted(true);
+
+        when(taskRepository.findByIdAndUserIdIncludingDeleted(3, 1))
+                .thenReturn(Optional.of(task));
+
+        when(userService.getUserById(1))
+                .thenReturn(Optional.of(user));
+
+        taskService.restoreTask(3, 1);
+
+        assertFalse(task.isDeleted());
+        assertNull(task.getDeletedAt());
+        assertEquals(user, task.getUser());
+
+        verify(taskRepository).save(task);
+    }
+
+    @Test
+    void testPermanentDeleteSuccess() {
+        User user = new User();
+        user.setId(1);
+
+        Task task = new Task();
+        task.setId(3);
+        task.setDeleted(true);
         task.setUser(user);
 
-        when(taskRepository.findById(3)).thenReturn(Optional.of(task));
+        when(taskRepository.findByIdAndUserIdAndDeletedTrue(3, 1))
+                .thenReturn(Optional.of(task));
 
-        taskService.deleteTask(3, 1);
+        taskService.permanentDelete(3, 1);
 
         verify(taskRepository).delete(task);
     }
 
     @Test
-    void testDeleteTaskNotFound() {
-        when(taskRepository.findById(10)).thenReturn(Optional.empty());
+    void testEmptyTrashSuccess() {
+        List<Task> tasks = List.of(new Task(), new Task());
 
-        assertThrows(
-                RuntimeException.class,
-                () -> taskService.deleteTask(10, 1)
-        );
+        when(taskRepository.findByUser_IdAndDeletedTrue(1))
+                .thenReturn(tasks);
+
+        taskService.emptyTrash(1);
+
+        verify(taskRepository).deleteAll(tasks);
     }
+
 
     @Test
     void testMarkTaskSuccess() {
@@ -174,7 +263,7 @@ class TaskServiceTest {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Task> page = new PageImpl<>(List.of(new Task()));
 
-        when(taskRepository.findByUser_IdAndStatusAndPriority(
+        when(taskRepository.findByUser_IdAndDeletedFalseAndStatusAndPriority(
                 1, TaskStatus.PENDING, TaskPriority.HIGH, pageable
         )).thenReturn(page);
 
@@ -187,8 +276,10 @@ class TaskServiceTest {
 
     @Test
     void testGetTasksDueToday() {
-        when(taskRepository.findByUser_IdAndDueDateAndStatusNot(
-                eq(1), any(LocalDate.class), eq(TaskStatus.COMPLETED)
+        when(taskRepository.findByUser_IdAndDeletedFalseAndDueDateAndStatusNot(
+                eq(1),
+                any(LocalDate.class),
+                eq(TaskStatus.COMPLETED)
         )).thenReturn(List.of(new Task()));
 
         List<Task> result = taskService.getTasksDueToday(1);
@@ -198,19 +289,33 @@ class TaskServiceTest {
 
     @Test
     void testGetUpcomingTasks() {
-        when(taskRepository.findByUser_IdAndDueDateBetweenAndStatusNot(
-                eq(1), any(), any(), eq(TaskStatus.COMPLETED)
-        )).thenReturn(List.of(new Task()));
+        Integer userId = 1;
+        int days = 7;
 
-        List<Task> result = taskService.getUpcomingTasks(1, 5);
+        Task task = new Task();
+        task.setDeleted(false);
+        task.setDueDate(LocalDate.now().plusDays(3));
+        task.setStatus(TaskStatus.PENDING);
+
+        when(taskRepository.findByUser_IdAndDeletedFalseAndDueDateBetweenAndStatusNot(
+                eq(userId),
+                any(LocalDate.class),
+                any(LocalDate.class),
+                eq(TaskStatus.COMPLETED)
+        )).thenReturn(List.of(task));
+
+        List<Task> result = taskService.getUpcomingTasks(userId, days);
 
         assertEquals(1, result.size());
     }
 
+
     @Test
     void testGetOverdueTasks() {
-        when(taskRepository.findByUser_IdAndDueDateBeforeAndStatusNot(
-                eq(1), any(), eq(TaskStatus.COMPLETED)
+        when(taskRepository.findByUser_IdAndDeletedFalseAndDueDateBeforeAndStatusNot(
+                eq(1),
+                any(LocalDate.class),
+                eq(TaskStatus.COMPLETED)
         )).thenReturn(List.of(new Task()));
 
         List<Task> result = taskService.getOverdueTasks(1);
@@ -237,7 +342,7 @@ class TaskServiceTest {
         Task t2 = new Task();
         t2.setCreatedAt(LocalDate.now().minusDays(1));
 
-        when(taskRepository.findByUser_Id(1))
+        when(taskRepository.findByUser_IdAndDeletedFalse(1))
                 .thenReturn(List.of(t2, t1));
 
         List<Task> result = taskService.getRecentTasks(1, 1);
@@ -246,12 +351,15 @@ class TaskServiceTest {
         assertEquals(t1, result.get(0));
     }
 
+
     @Test
     void testGetHighPriorityTasks() {
         Page<Task> page = new PageImpl<>(List.of(new Task()));
 
-        when(taskRepository.findByUser_IdAndPriority(
-                eq(1), eq(TaskPriority.HIGH), any(Pageable.class)
+        when(taskRepository.findByUser_IdAndDeletedFalseAndPriority(
+                eq(1),
+                eq(TaskPriority.HIGH),
+                any(Pageable.class)
         )).thenReturn(page);
 
         List<Task> result = taskService.getHighPriorityTasks(1);
@@ -260,11 +368,23 @@ class TaskServiceTest {
     }
 
     @Test
+    void testGetPendingTasks() {
+        when(taskRepository.findByUser_IdAndDeletedFalseAndStatus(
+                eq(1),
+                eq(TaskStatus.PENDING)
+        )).thenReturn(List.of(new Task()));
+
+        assertEquals(1, taskService.getPendingTasks(1).size());
+    }
+
+    @Test
     void testGetCompletedTasks() {
         Page<Task> page = new PageImpl<>(List.of(new Task()));
 
-        when(taskRepository.findByUser_IdAndStatus(
-                eq(1), eq(TaskStatus.COMPLETED), any(Pageable.class)
+        when(taskRepository.findByUser_IdAndDeletedFalseAndStatus(
+                eq(1),
+                eq(TaskStatus.COMPLETED),
+                any(Pageable.class)
         )).thenReturn(page);
 
         List<Task> result = taskService.getCompletedTasks(1);
@@ -272,21 +392,18 @@ class TaskServiceTest {
         assertEquals(1, result.size());
     }
 
-    @Test
-    void testGetPendingTasks() {
-        when(taskRepository.findByUser_IdAndStatus(
-                1, TaskStatus.PENDING
-        )).thenReturn(List.of(new Task()));
 
-        assertEquals(1, taskService.getPendingTasks(1).size());
-    }
 
     @Test
     void testGetInProgressTasks() {
-        when(taskRepository.findByUser_IdAndStatus(
-                1, TaskStatus.IN_PROGRESS
+        when(taskRepository.findByUser_IdAndDeletedFalseAndStatus(
+                eq(1),
+                eq(TaskStatus.IN_PROGRESS)
         )).thenReturn(List.of(new Task()));
 
-        assertEquals(1, taskService.getInProgressTasks(1).size());
+        List<Task> result = taskService.getInProgressTasks(1);
+
+        assertEquals(1, result.size());
     }
+
 }

@@ -39,6 +39,11 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    private LocalDateTime deletedAt;
+
     public Task(){}
 
     public Task(String title, String description, LocalDate dueDate, TaskStatus status, TaskPriority priority) {
@@ -138,4 +143,20 @@ public class Task {
     public LocalDate getCompletedAt() {return completedAt;}
 
     public void setCompletedAt(LocalDate completedAt) {this.completedAt = completedAt;}
+
+    public void setDeleted(boolean deleted){
+        this.deleted=deleted;
+    }
+
+    public boolean isDeleted(){
+        return deleted;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt){
+        this.deletedAt=deletedAt;
+    }
+
+    public LocalDateTime getDeletedAt(){
+        return deletedAt;
+    }
 }
