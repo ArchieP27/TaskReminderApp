@@ -6,7 +6,6 @@
 ![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
 ![Thymeleaf](https://img.shields.io/badge/View-Thymeleaf-darkgreen)
 ![Scheduler](https://img.shields.io/badge/Scheduler-Enabled-purple)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ## 📌 Description
